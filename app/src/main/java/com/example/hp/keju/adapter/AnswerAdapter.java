@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.hp.jskjapplication.R;
+import com.example.hp.keju.R;
 import com.example.hp.keju.entity.QuestionEntity;
 
 import java.util.ArrayList;

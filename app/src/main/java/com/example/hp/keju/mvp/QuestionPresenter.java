@@ -25,17 +25,19 @@ public class QuestionPresenter implements QuestionContract.Presenter {
     @Override
     public void initQuestions() {
 
+        mView.showProgressBar(true);
         int offset = 0;
         int count = 500;
         initCount = count;
         getQuestionByBmob(offset, count);
-
     }
 
     @Override
     public void getQuestionsByLocal(String condition) {
+        mView.showProgressBar(true);
         List<QuestionEntity> data = LocalQuestionCRUDUtil.getInstance(mView.getApp()).retrieve(condition);
         mView.showQuestions(data);
+        mView.showProgressBar(false);
     }
 
 
@@ -50,10 +52,8 @@ public class QuestionPresenter implements QuestionContract.Presenter {
                     getQuestionByBmob(offset + count, count);
                 } else {
                     LogUtil.e("size" + questions.size());
-//                    mView.showQuestions(questions);
-//                    mView.showProgressBar(false);
-//                    LocalQuestionCRUDUtil.getInstance(mView.getApp()).deleteAll();
                     LocalQuestionCRUDUtil.getInstance(mView.getApp()).create(questions);
+                    mView.showProgressBar(false);
                 }
             }
 

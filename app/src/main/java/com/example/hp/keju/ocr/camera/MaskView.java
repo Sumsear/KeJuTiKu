@@ -23,7 +23,8 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.example.hp.jskjapplication.R;
+import com.example.hp.keju.R;
+
 
 @SuppressWarnings("unused")
 public class MaskView extends View {

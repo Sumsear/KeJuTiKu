@@ -24,7 +24,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.example.hp.jskjapplication.R;
+import com.example.hp.keju.R;
 import com.example.hp.keju.adapter.AnswerAdapter;
 import com.example.hp.keju.entity.OCRResultEntity;
 import com.example.hp.keju.ocr.camera.CameraActivity;
@@ -102,7 +102,6 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
 
                 switch (item.getItemId()) {
                     case R.id.menu_init:
-                        Toast.makeText(QuestionActivity.this, "menu_init", Toast.LENGTH_SHORT).show();
                         mPresenter.initQuestions();
                         break;
                 }
@@ -110,17 +109,13 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
             }
         });
 
-
         etQuestion = findViewById(R.id.et_q);
+
         //计划使用BMOB,但是BMOB内部使用的RXJava+Retrofit所以本项目中请求网站直接用系统原生的HttpUrlConnection
         btnSearch = findViewById(R.id.btn_s);
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                final String q = etQuestion.getText().toString().trim();
-//                pd.show();
-//                mPresenter.getQuestionsByLocal(q);
 
                 Intent intent = new Intent(QuestionActivity.this, CameraActivity.class);
                 intent.putExtra(CameraActivity.KEY_OUTPUT_FILE_PATH,
@@ -157,7 +152,11 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
 
     @Override
     public void showProgressBar(boolean show) {
-
+        if (show){
+            pd.show();
+        }else{
+            pd.dismiss();
+        }
     }
 
     @Override
@@ -191,9 +190,11 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
                 String result = arr[which];
                 LogUtil.e(result);
                 etQuestion.setText(result);
+                mPresenter.getQuestionsByLocal(result);
                 dialog.dismiss();
             }
         });
+
         builder.setTitle("请选择与题目字段一致的选项！");
         builder.create().show();
     }

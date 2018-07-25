@@ -27,7 +27,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.hp.jskjapplication.R;
+import com.example.hp.keju.R;
 import com.example.hp.keju.ocr.idcardquality.IDcardQualityProcess;
 import com.example.hp.keju.util.DimensionUtil;
 import com.example.hp.keju.util.ImageUtil;

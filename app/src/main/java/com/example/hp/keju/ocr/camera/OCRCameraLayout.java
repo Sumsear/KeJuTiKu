@@ -14,7 +14,8 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import com.example.hp.jskjapplication.R;
+import com.example.hp.keju.R;
+
 
 public class OCRCameraLayout extends FrameLayout {
 

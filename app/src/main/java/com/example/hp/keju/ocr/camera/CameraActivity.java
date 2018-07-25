@@ -29,7 +29,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.example.hp.jskjapplication.R;
+import com.example.hp.keju.R;
 import com.example.hp.keju.ocr.crop.CropView;
 import com.example.hp.keju.ocr.crop.FrameOverlayView;
 import com.example.hp.keju.ocr.idcardquality.IDcardQualityProcess;

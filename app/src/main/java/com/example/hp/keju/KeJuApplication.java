@@ -7,7 +7,7 @@ import com.baidu.ocr.sdk.OCR;
 import com.baidu.ocr.sdk.OnResultListener;
 import com.baidu.ocr.sdk.exception.OCRError;
 import com.baidu.ocr.sdk.model.AccessToken;
-import com.example.hp.jskjapplication.BuildConfig;
+
 
 import com.example.hp.keju.entity.DaoMaster;
 import com.example.hp.keju.entity.DaoSession;
