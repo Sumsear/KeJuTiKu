@@ -1,6 +1,7 @@
 package com.example.hp.keju.mvp;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -38,7 +39,7 @@ import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.List;
 
-public class QuestionActivity extends BaseActivity implements QuestionContract.View {
+public class QuestionActivity extends BaseActivity implements QuestionContract.View{
 
     private final static int GET_QUESTION_SUCCESS = 0x0001;
     private final static int GET_QUESTION_DEFAULT = 0x0002;
@@ -52,7 +53,6 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
     private AnswerAdapter adapter;
 
     private QuestionContract.Presenter mPresenter;
-    private MyHandler mHandler = new MyHandler(this);
     private ProgressDialog pd;
 
     @Override
@@ -136,7 +136,7 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
         rvAnswer.setAdapter(adapter);
 
         pd = new ProgressDialog(this);
-        pd.setMessage("正在查找...");
+        pd.setMessage("正在加载，请稍后...");
     }
 
     @Override
@@ -152,9 +152,9 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
 
     @Override
     public void showProgressBar(boolean show) {
-        if (show){
+        if (show) {
             pd.show();
-        }else{
+        } else {
             pd.dismiss();
         }
     }
@@ -174,6 +174,30 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
         mPresenter = presenter;
     }
 
+    @Override
+    void handleMessage(Activity activity, Message msg) {
+        if (activity instanceof QuestionActivity) {
+            QuestionActivity ac = (QuestionActivity) activity;
+            switch (msg.what) {
+                case GET_QUESTION_SUCCESS:
+                    List<QuestionEntity> questions = msg.getData().getParcelableArrayList("questions");
+                    ac.adapter.setData(questions);
+                    ac.pd.dismiss();
+                    break;
+                case GET_QUESTION_DEFAULT:
+                    ac.pd.dismiss();
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    /**
+     * TODO 显示识别结果到的
+     *
+     * @param data 识别结果列表
+     */
     private void showListDialog(List<String> data) {
 
         if (data == null) return;
@@ -195,38 +219,13 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
             }
         });
 
-        builder.setTitle("请选择与题目字段一致的选项！");
+        builder.setTitle("请选择与题目一致的选项！");
         builder.create().show();
     }
 
-    private static class MyHandler extends Handler {
-
-        SoftReference<QuestionActivity> ref;
-
-        public MyHandler(QuestionActivity activity) {
-            this.ref = new SoftReference<>(activity);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            QuestionActivity ac = ref.get();
-            if (ac != null) {
-
-                switch (msg.what) {
-                    case GET_QUESTION_SUCCESS:
-                        List<QuestionEntity> questions = msg.getData().getParcelableArrayList("questions");
-                        ac.adapter.setData(questions);
-                        ac.pd.dismiss();
-                        break;
-                    case GET_QUESTION_DEFAULT:
-                        ac.pd.dismiss();
-                        break;
-                    default:
-                        break;
-
-                }
-            }
-        }
+    @Override
+    public void showToast(String msg) {
+        super.showToast(msg);
     }
+
 }

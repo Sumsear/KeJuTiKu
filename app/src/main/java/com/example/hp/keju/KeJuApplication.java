@@ -2,6 +2,7 @@ package com.example.hp.keju;
 
 import android.app.Application;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.v4.content.ContextCompat;
 
 import com.baidu.ocr.sdk.OCR;
 import com.baidu.ocr.sdk.OnResultListener;
@@ -26,7 +27,7 @@ public class KeJuApplication extends Application {
 
         //初始化 BMOB
         BmobConfig bmobConfig = new BmobConfig.Builder(this)
-                .setApplicationId("ae88526cf2cc64f644da86d15c15669c")
+                .setApplicationId(getString(R.string.key))
                 .setConnectTimeout(15)//单位为秒
                 .build();
         Bmob.initialize(bmobConfig);

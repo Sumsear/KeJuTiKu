@@ -67,18 +67,18 @@ public class AnswerAdapter extends RecyclerView.Adapter<AnswerAdapter.AnswerView
         private TextView tvQ;
         private TextView tvA;
 
-        public AnswerViewHolder(View itemView) {
+        AnswerViewHolder(View itemView) {
             super(itemView);
 
             tvQ = itemView.findViewById(R.id.item_tv_q);
             tvA = itemView.findViewById(R.id.item_tv_a);
         }
 
-        public void setQuestion(String q) {
+        void setQuestion(String q) {
             if (q != null) tvQ.setText(q);
         }
 
-        public void setAnswer(String a) {
+        void setAnswer(String a) {
             if (a != null) tvA.setText(a);
         }
     }

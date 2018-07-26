@@ -24,6 +24,8 @@ public class QuestionContract {
         void initQuestions();
 
         void getQuestionsByLocal(String condition);
+
+        void getQuestionsByDuoWan(String condition);
     }
 
 }

@@ -15,7 +15,7 @@ public class QuestionPresenter implements QuestionContract.Presenter {
 
     private QuestionContract.View mView;
     private int initCount;
-    private List<QuestionEntity> questions = new ArrayList<>(1000);
+    private final List<QuestionEntity> questions = new ArrayList<>(1000);
 
     public QuestionPresenter(QuestionContract.View mView) {
         this.mView = mView;
@@ -29,15 +29,31 @@ public class QuestionPresenter implements QuestionContract.Presenter {
         int offset = 0;
         int count = 500;
         initCount = count;
-        getQuestionByBmob(offset, count);
+        synchronized (questions) {
+            questions.clear();
+            getQuestionByBmob(offset, count);
+        }
     }
 
     @Override
     public void getQuestionsByLocal(String condition) {
         mView.showProgressBar(true);
+        if (condition.indexOf(",") == 0) {
+            condition = condition.replaceFirst(",", "");
+        }
+        if (condition.lastIndexOf("?") == condition.length() - 1) {
+            condition = condition.substring(0, condition.length() - 1);
+        }
+        LogUtil.e("condition", condition);
         List<QuestionEntity> data = LocalQuestionCRUDUtil.getInstance(mView.getApp()).retrieve(condition);
+        mView.showToast("数量:" + data.size());
         mView.showQuestions(data);
         mView.showProgressBar(false);
+    }
+
+    @Override
+    public void getQuestionsByDuoWan(String condition) {
+        getQuestionByDuoWan(condition);
     }
 
 
@@ -51,9 +67,9 @@ public class QuestionPresenter implements QuestionContract.Presenter {
                 if (initCount == count) {
                     getQuestionByBmob(offset + count, count);
                 } else {
-                    LogUtil.e("size" + questions.size());
                     LocalQuestionCRUDUtil.getInstance(mView.getApp()).create(questions);
                     mView.showProgressBar(false);
+                    mView.showToast("共加载题目: " + questions.size());
                 }
             }
 
@@ -71,25 +87,31 @@ public class QuestionPresenter implements QuestionContract.Presenter {
      */
     private void getQuestionByDuoWan(String q) {
         String url = String.format("http://tool.duowan.com/jx3/ui/exam/ex.php?s=1&q=%s&_=" + System.currentTimeMillis(), q);
+        LogUtil.e("getQuestionByDuoWan", url);
         HttpUtil.getInstance().get(url, new RequestCallBack<List<QuestionEntity>>() {
             @Override
             public void success(int code, List<QuestionEntity> questions) {
+
+                //显示题目
+                mView.showQuestions(questions);
+                //将题目添加到题库
                 BMobCRUDUtil.getInstance().create(questions, new RequestCallBack<Integer>() {
                     @Override
                     public void success(int code, Integer data) {
-                        //添加成功
+                        //添加成功 暂时不做处理
                     }
 
                     @Override
                     public void defeated(int code, String msg) {
-                        //添加失败
+                        //添加失败 暂时不做处理
                     }
                 });
             }
 
             @Override
             public void defeated(int code, String msg) {
-
+                //查询失败 暂时不做处理
+                mView.showToast("没有查询到试题的答案，施主还是自强吧！");
             }
         });
     }

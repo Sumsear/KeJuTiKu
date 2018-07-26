@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">jskj Application</string>
-    <string name="title">"统一认证"</string>
+    <string name="title">"百年烟云只过眼"</string>
     <string name="title_activity_base">BaseActivity</string>
     <string name="camera_permission_required">本功能需要相机权限！</string>
+    <string name="toast_icon_desc">toast icon</string>
+    <string name="et_hint_question">请点击搜索按钮识别考题！</string>
 </resources>

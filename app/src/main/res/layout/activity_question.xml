@@ -23,6 +23,7 @@
         android:id="@+id/et_q"
         android:layout_width="0dp"
         android:layout_height="45dp"
+        android:hint="@string/et_hint_question"
         app:layout_constraintTop_toBottomOf="@id/main_title"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
