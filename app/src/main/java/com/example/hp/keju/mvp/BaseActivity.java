@@ -46,7 +46,7 @@ public abstract class BaseActivity extends AppCompatActivity{
     }
 
     /**
-     * TODO 用来做线程间通信
+     * TODO 线程间通信
      */
     public static class MyHandler extends Handler {
 

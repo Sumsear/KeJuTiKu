@@ -46,6 +46,7 @@ public class LocalQuestionCRUDUtil {
      * @param questions
      */
     public void create(List<QuestionEntity> questions) {
+        mDao.deleteAll();
         mDao.insertInTx(questions);
     }
 
@@ -69,14 +70,12 @@ public class LocalQuestionCRUDUtil {
      * TODO 改
      */
     public void update() {
-
     }
 
     /**
      * TODO 查
      */
     public List<QuestionEntity> retrieve() {
-
         return retrieve("");
     }
 
@@ -100,7 +99,6 @@ public class LocalQuestionCRUDUtil {
      * @param builder QueryBuilder
      */
     public <T> List<T> retrieve(QueryBuilder<T> builder) {
-
         return builder.build().list();
     }
 

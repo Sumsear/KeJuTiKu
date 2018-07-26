@@ -14,7 +14,7 @@ import java.util.List;
 public class QuestionPresenter implements QuestionContract.Presenter {
 
     private QuestionContract.View mView;
-    private int initCount;
+    private volatile int initCount;//多线程调用，volatile 防止出现并发问题
     private final List<QuestionEntity> questions = new ArrayList<>(1000);
 
     public QuestionPresenter(QuestionContract.View mView) {
@@ -57,6 +57,11 @@ public class QuestionPresenter implements QuestionContract.Presenter {
     }
 
 
+    /**
+     * TODO
+     * @param offset
+     * @param count
+     */
     private void getQuestionByBmob(final int offset, final int count) {
         //服务端查询问题以及答案
         BMobCRUDUtil.getInstance().retrieve(offset, count, new RequestCallBack<List<QuestionEntity>>() {

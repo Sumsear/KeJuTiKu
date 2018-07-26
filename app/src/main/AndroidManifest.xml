@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.hp.keju">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -16,13 +17,15 @@
 
     <application
         android:name=".KeJuApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".mvp.QuestionActivity"
+        android:theme="@style/AppTheme"
+        tools:replace="android:allowBackup">
+        <activity
+            android:name=".mvp.QuestionActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
@@ -30,7 +33,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ocr.camera.CameraActivity"
             android:configChanges="screenSize|orientation"
@@ -38,6 +40,12 @@
             android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen">
 
         </activity>
+
+        <service
+            android:name=".service.QIntentService"
+            android:exported="false">
+
+        </service>
     </application>
 
 </manifest>

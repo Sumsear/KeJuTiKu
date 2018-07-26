@@ -14,6 +14,9 @@ import com.example.hp.keju.entity.DaoMaster;
 import com.example.hp.keju.entity.DaoSession;
 import com.example.hp.keju.util.LogUtil;
 
+import org.greenrobot.greendao.DaoLog;
+import org.greenrobot.greendao.query.QueryBuilder;
+
 import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobConfig;
 
@@ -44,6 +47,8 @@ public class KeJuApplication extends Application {
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "questions_db");
         SQLiteDatabase db = helper.getWritableDatabase();
         mSession = new DaoMaster(db).newSession();
+        QueryBuilder.LOG_SQL = true;
+        QueryBuilder.LOG_VALUES = true;
     }
 
     private void initOCR(){
