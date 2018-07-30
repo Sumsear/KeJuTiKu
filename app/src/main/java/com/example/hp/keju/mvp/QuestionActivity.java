@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import com.example.hp.keju.R;
 import com.example.hp.keju.adapter.AnswerAdapter;
+import com.example.hp.keju.callback.PermissionCallBack;
 import com.example.hp.keju.entity.OCRResultEntity;
 import com.example.hp.keju.ocr.camera.CameraActivity;
 import com.example.hp.keju.entity.QuestionEntity;
@@ -55,14 +56,30 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
     private QuestionContract.Presenter mPresenter;
     private ProgressDialog pd;
 
+    private PermissionCallBack mCallBack = new PermissionCallBack() {
+        @Override
+        public void granted(int code) {
+            switch (code){
+                case 10086:
+
+                break;
+                default:
+                    break;
+            }
+        }
+
+        @Override
+        public void denied(int code) {
+
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE}, 10000);
-        }
+        requestPermission(Manifest.permission.READ_PHONE_STATE, 1000, mCallBack);
 
         new QuestionPresenter(this);
 
