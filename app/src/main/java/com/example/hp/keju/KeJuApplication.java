@@ -27,13 +27,8 @@ public class KeJuApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        initBmob();
 
-        //初始化 BMOB
-        BmobConfig bmobConfig = new BmobConfig.Builder(this)
-                .setApplicationId(getString(R.string.key))
-                .setConnectTimeout(15)//单位为秒
-                .build();
-        Bmob.initialize(bmobConfig);
 
         LogUtil.setEnable(BuildConfig.DEBUG);
 
@@ -42,6 +37,21 @@ public class KeJuApplication extends Application {
         initOCR();
     }
 
+    /**
+     * TODO 初始化 bmob
+     */
+    private void initBmob() {
+        //初始化 BMOB
+        BmobConfig bmobConfig = new BmobConfig.Builder(this)
+                .setApplicationId(getString(R.string.key))
+                .setConnectTimeout(15)//单位为秒
+                .build();
+        Bmob.initialize(bmobConfig);
+    }
+
+    /**
+     * TODO 初始化 本地数据库
+     */
     private void initDataBase() {
 
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "questions_db");
@@ -51,6 +61,9 @@ public class KeJuApplication extends Application {
         QueryBuilder.LOG_VALUES = true;
     }
 
+    /**
+     * TODO 初始化 BaiDu ORC
+     */
     private void initOCR(){
 
         OCR.getInstance(this).initAccessToken(new OnResultListener<AccessToken>() {
