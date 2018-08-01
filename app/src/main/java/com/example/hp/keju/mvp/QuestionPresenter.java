@@ -39,7 +39,10 @@ public class QuestionPresenter implements QuestionContract.Presenter {
     public void getQuestionsByLocal(String condition) {
         mView.showProgressBar(true);
         if (condition.indexOf(",") == 0) {
-            condition = condition.replaceFirst(",", "");
+            condition = condition.substring(1, condition.length());
+        }
+        if (condition.lastIndexOf(",") == condition.length() - 1){
+            condition = condition.substring(0, condition.length()-1);
         }
         if (condition.lastIndexOf("?") == condition.length() - 1) {
             condition = condition.substring(0, condition.length() - 1);
