@@ -41,8 +41,8 @@ public class QuestionPresenter implements QuestionContract.Presenter {
         if (condition.indexOf(",") == 0) {
             condition = condition.substring(1, condition.length());
         }
-        if (condition.lastIndexOf(",") == condition.length() - 1){
-            condition = condition.substring(0, condition.length()-1);
+        if (condition.lastIndexOf(",") == condition.length() - 1) {
+            condition = condition.substring(0, condition.length() - 1);
         }
         if (condition.lastIndexOf("?") == condition.length() - 1) {
             condition = condition.substring(0, condition.length() - 1);
@@ -50,8 +50,12 @@ public class QuestionPresenter implements QuestionContract.Presenter {
         LogUtil.e("condition", condition);
         List<QuestionEntity> data = LocalQuestionCRUDUtil.getInstance(mView.getApp()).retrieve(condition);
         mView.showToast("数量:" + data.size());
-        mView.showQuestions(data);
-        mView.showProgressBar(false);
+        if (data.size() <= 0) {
+            getQuestionsByDuoWan(condition);
+        } else {
+            mView.showQuestions(data);
+            mView.showProgressBar(false);
+        }
     }
 
     @Override
@@ -62,6 +66,7 @@ public class QuestionPresenter implements QuestionContract.Presenter {
 
     /**
      * TODO
+     *
      * @param offset
      * @param count
      */
