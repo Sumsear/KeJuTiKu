@@ -24,6 +24,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
+        <!-- welcome -->
         <activity
             android:name=".mvp.WelcomeActivity"
             android:screenOrientation="portrait">
@@ -33,13 +34,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <!-- question -->
         <activity android:name=".mvp.tiku.QuestionActivity"
             android:configChanges="screenSize|orientation"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden">
 
         </activity>
+        <!-- BaiDu ORC Camera-->
         <activity
             android:name=".ocr.camera.CameraActivity"
             android:configChanges="screenSize|orientation"
@@ -48,6 +50,7 @@
 
         </activity>
 
+        <!-- intent service -->
         <service
             android:name=".service.QIntentService"
             android:exported="false">
