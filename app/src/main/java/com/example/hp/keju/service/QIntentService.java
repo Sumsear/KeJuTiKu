@@ -1,8 +1,27 @@
 package com.example.hp.keju.service;
 
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.Context;
+import android.os.Build;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
+import android.widget.RemoteViews;
+import android.widget.Toast;
+
+import com.example.hp.keju.R;
+import com.example.hp.keju.callback.RequestCallBack;
+import com.example.hp.keju.entity.QuestionEntity;
+import com.example.hp.keju.util.BMobCRUDUtil;
+import com.example.hp.keju.util.CustomToast;
+import com.example.hp.keju.util.LocalQuestionCRUDUtil;
+import com.example.hp.keju.util.LogUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -12,80 +31,102 @@ import android.content.Context;
  * helper methods.
  */
 public class QIntentService extends IntentService {
-    // TODO: Rename actions, choose action names that describe tasks that this
-    // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
-    private static final String ACTION_FOO = "com.example.hp.keju.service.action.FOO";
-    private static final String ACTION_BAZ = "com.example.hp.keju.service.action.BAZ";
 
-    // TODO: Rename parameters
-    private static final String EXTRA_PARAM1 = "com.example.hp.keju.service.extra.PARAM1";
-    private static final String EXTRA_PARAM2 = "com.example.hp.keju.service.extra.PARAM2";
+    private static final String ACTION_INIT_QUESTION = "com.example.hp.keju.service.action.INIT_QUESTION";
+    private static final int NOTIFICATION_ID = 10086;
+    private static final String NOTIFICATION_CHANNEL_ID = "NOTIFY_ID";
+    private static final String NOTIFICATION_CHANNEL_NAME = "NOTIFY_NAME";
+
+    private volatile int initCount;//多线程调用，volatile 防止出现并发问题
+    private final List<QuestionEntity> questions = new ArrayList<>(1000);
+
 
     public QIntentService() {
         super("QIntentService");
     }
 
     /**
-     * Starts this service to perform action Foo with the given parameters. If
-     * the service is already performing a task this action will be queued.
+     * TODO 启动IntentService初始化题库，如果这个IntentService已经启动，那么初始化题库任务将会被加入到队列
      *
      * @see IntentService
      */
-    // TODO: Customize helper method
-    public static void startActionFoo(Context context, String param1, String param2) {
+    public static void startInitQuestion(Context context) {
         Intent intent = new Intent(context, QIntentService.class);
-        intent.setAction(ACTION_FOO);
-        intent.putExtra(EXTRA_PARAM1, param1);
-        intent.putExtra(EXTRA_PARAM2, param2);
+        intent.setAction(ACTION_INIT_QUESTION);
         context.startService(intent);
     }
 
-    /**
-     * Starts this service to perform action Baz with the given parameters. If
-     * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
-     */
-    // TODO: Customize helper method
-    public static void startActionBaz(Context context, String param1, String param2) {
-        Intent intent = new Intent(context, QIntentService.class);
-        intent.setAction(ACTION_BAZ);
-        intent.putExtra(EXTRA_PARAM1, param1);
-        intent.putExtra(EXTRA_PARAM2, param2);
-        context.startService(intent);
-    }
 
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
             final String action = intent.getAction();
-            if (ACTION_FOO.equals(action)) {
-                final String param1 = intent.getStringExtra(EXTRA_PARAM1);
-                final String param2 = intent.getStringExtra(EXTRA_PARAM2);
-                handleActionFoo(param1, param2);
-            } else if (ACTION_BAZ.equals(action)) {
-                final String param1 = intent.getStringExtra(EXTRA_PARAM1);
-                final String param2 = intent.getStringExtra(EXTRA_PARAM2);
-                handleActionBaz(param1, param2);
+            if (ACTION_INIT_QUESTION.equals(action)) {
+                initQuestion();
             }
         }
     }
 
     /**
-     * Handle action Foo in the provided background thread with the provided
-     * parameters.
+     * TODO 发送通知
      */
-    private void handleActionFoo(String param1, String param2) {
-        // TODO: Handle action Foo
-        throw new UnsupportedOperationException("Not yet implemented");
+    private void showNotification(String content) {
+        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationCompat.Builder nb = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
+        nb.setAutoCancel(true);
+        nb.setSmallIcon(R.mipmap.ic_launcher_round);
+        nb.setContentTitle("更新题库");
+        nb.setContentText(content);
+
+        if (nm != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                NotificationChannel nc = new NotificationChannel(NOTIFICATION_CHANNEL_ID, NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
+                nm.createNotificationChannel(nc);
+            }
+            nm.notify(NOTIFICATION_ID, nb.build());
+        }
     }
 
     /**
-     * Handle action Baz in the provided background thread with the provided
-     * parameters.
+     * TODO 初始化本地题库
      */
-    private void handleActionBaz(String param1, String param2) {
-        // TODO: Handle action Baz
-        throw new UnsupportedOperationException("Not yet implemented");
+    private void initQuestion() {
+        int offset = 0;//从0开始
+        int count = 500;//每次获取500条
+        initCount = count;
+        synchronized (questions) {
+            questions.clear();
+            getQuestionByBmob(offset, count);
+        }
     }
+
+
+    /**
+     * TODO 获取BMob上的题目
+     *
+     * @param offset 偏移位置
+     * @param count  获取条数
+     */
+    private void getQuestionByBmob(final int offset, final int count) {
+        //服务端查询问题以及答案
+        BMobCRUDUtil.getInstance().retrieve(offset, count, new RequestCallBack<List<QuestionEntity>>() {
+            @Override
+            public void success(int code, List<QuestionEntity> data) {
+                initCount = data.size();
+                questions.addAll(data);
+                if (initCount == count) {
+                    getQuestionByBmob(offset + count, count);
+                } else {
+                    LocalQuestionCRUDUtil.getInstance(QIntentService.this.getApplication()).create(questions);
+                    showNotification(String.format("本次更新题目 %s 条", questions.size()));
+                }
+            }
+
+            @Override
+            public void defeated(int code, String msg) {
+
+            }
+        });
+    }
+
 }

@@ -25,13 +25,20 @@
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
         <activity
-            android:name=".mvp.QuestionActivity"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden">
+            android:name=".mvp.WelcomeActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity android:name=".mvp.tiku.QuestionActivity"
+            android:configChanges="screenSize|orientation"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden">
+
         </activity>
         <activity
             android:name=".ocr.camera.CameraActivity"
@@ -46,6 +53,7 @@
             android:exported="false">
 
         </service>
+
     </application>
 
 </manifest>

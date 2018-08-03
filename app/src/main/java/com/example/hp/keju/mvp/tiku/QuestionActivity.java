@@ -1,4 +1,4 @@
-package com.example.hp.keju.mvp;
+package com.example.hp.keju.mvp.tiku;
 
 import android.Manifest;
 import android.app.Activity;
@@ -6,8 +6,6 @@ import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
-import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
 import android.os.Bundle;
@@ -23,12 +21,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.example.hp.keju.R;
 import com.example.hp.keju.adapter.AnswerAdapter;
 import com.example.hp.keju.callback.PermissionCallBack;
 import com.example.hp.keju.entity.OCRResultEntity;
+import com.example.hp.keju.mvp.BaseActivity;
 import com.example.hp.keju.ocr.camera.CameraActivity;
 import com.example.hp.keju.entity.QuestionEntity;
 import com.example.hp.keju.util.FileUtil;
@@ -36,7 +34,6 @@ import com.example.hp.keju.util.LogUtil;
 import com.example.hp.keju.ocr.RecognizeService;
 import com.google.gson.Gson;
 
-import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -192,7 +189,7 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
     }
 
     @Override
-    void handleMessage(Activity activity, Message msg) {
+    public void handleMessage(Activity activity, Message msg) {
         if (activity instanceof QuestionActivity) {
             QuestionActivity ac = (QuestionActivity) activity;
             switch (msg.what) {

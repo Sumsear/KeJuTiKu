@@ -1,8 +1,10 @@
-package com.example.hp.keju.mvp;
+package com.example.hp.keju.mvp.tiku;
 
 import android.app.Application;
 
 import com.example.hp.keju.entity.QuestionEntity;
+import com.example.hp.keju.mvp.BasePresenter;
+import com.example.hp.keju.mvp.BaseView;
 
 import java.util.List;
 

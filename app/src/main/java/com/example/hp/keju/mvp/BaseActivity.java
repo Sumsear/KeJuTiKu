@@ -84,7 +84,7 @@ public abstract class BaseActivity extends AppCompatActivity {
      * @param activity activity
      * @param msg      messag
      */
-    void handleMessage(Activity activity, Message msg) {
+    public void handleMessage(Activity activity, Message msg) {
     }
 
     /**
