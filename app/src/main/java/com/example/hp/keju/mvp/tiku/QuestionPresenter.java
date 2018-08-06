@@ -38,12 +38,19 @@ public class QuestionPresenter implements QuestionContract.Presenter {
     @Override
     public void getQuestionsByLocal(String condition) {
         mView.showProgressBar(true);
+        //长度大于5  去掉首尾，防止首尾文字识别错误
+        if (condition.length() > 5) {
+            condition = condition.substring(1, condition.length() - 1);
+        }
+        //去掉首尾后检测字符串首端字符是否是逗号，如果是去掉
         if (condition.indexOf(",") == 0) {
             condition = condition.substring(1, condition.length());
         }
+        //检测字符串末尾字符是否是逗号，如果是去掉
         if (condition.lastIndexOf(",") == condition.length() - 1) {
             condition = condition.substring(0, condition.length() - 1);
         }
+        //检测字符串末尾字符是否是问号，如果是去掉
         if (condition.lastIndexOf("?") == condition.length() - 1) {
             condition = condition.substring(0, condition.length() - 1);
         }
@@ -51,11 +58,10 @@ public class QuestionPresenter implements QuestionContract.Presenter {
         List<QuestionEntity> data = LocalQuestionCRUDUtil.getInstance(mView.getApp()).retrieve(condition);
         mView.showToast("数量:" + data.size());
         if (data.size() <= 0) {
-            getQuestionsByDuoWan(condition);
-        } else {
-            mView.showQuestions(data);
-            mView.showProgressBar(false);
+            mView.showToast("没有查询到试题的答案，施主还是自强吧！");
         }
+        mView.showQuestions(data);
+        mView.showProgressBar(false);
     }
 
     @Override

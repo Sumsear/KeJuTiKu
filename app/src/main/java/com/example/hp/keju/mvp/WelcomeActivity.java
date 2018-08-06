@@ -33,6 +33,7 @@ public class WelcomeActivity extends BaseActivity {
             public void run() {
                 Intent intent = new Intent(WelcomeActivity.this, QuestionActivity.class);
                 startActivity(intent);
+                WelcomeActivity.this.finish();
             }
         }, 3000);
     }
