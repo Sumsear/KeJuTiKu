@@ -1,7 +1,15 @@
 apply plugin: 'com.android.application'
 apply plugin: 'org.greenrobot.greendao'
-
+apply from: 'resguard.gradle'
 android {
+    signingConfigs {
+        config {
+            keyAlias 'xzh'
+            keyPassword 'xzh1990'
+            storeFile file('E:/keystore/xzh.jks')
+            storePassword 'xzh1990'
+        }
+    }
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.xzh.jskjapplication"
@@ -24,6 +32,7 @@ android {
             // 移除无用的resource文件
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
 
         debug {
@@ -31,7 +40,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
     useLibrary 'org.apache.http.legacy'
 }
 

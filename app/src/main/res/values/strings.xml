@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">圣僧牌科举题库</string>
+    <string name="app_name">基三科举题库</string>
     <string name="title">"百年烟云只过眼"</string>
     <string name="title_activity_base">BaseActivity</string>
     <string name="camera_permission_required">本功能需要相机权限！</string>
