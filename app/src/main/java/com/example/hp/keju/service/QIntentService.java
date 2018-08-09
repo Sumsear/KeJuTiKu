@@ -88,7 +88,7 @@ public class QIntentService extends IntentService {
     private void showNotification(String content, boolean isComplete) {
         NotificationCompat.Builder nb = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
         nb.setAutoCancel(true);
-        nb.setSmallIcon(R.mipmap.ic_launcher_round);
+        nb.setSmallIcon(R.mipmap.ic_launcher);
         nb.setContentTitle("更新题库");
         nb.setContentText(content);
         if (!isComplete) {

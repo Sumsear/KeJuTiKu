@@ -38,7 +38,7 @@ public class HttpUtil {
     }
 
 
-    public void get(final String urlAddress, final RequestCallBack callBack) {
+    public void get(final String urlAddress, final RequestCallBack<List<QuestionEntity>> callBack) {
 
         executor.execute(new Runnable() {
             @Override

@@ -2,6 +2,7 @@ package com.example.hp.keju.mvp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.widget.ImageView;
 
 import com.example.hp.keju.R;
@@ -28,6 +29,7 @@ public class WelcomeActivity extends BaseActivity {
     private void init() {
 
         imWel = findViewById(R.id.wel_im);
+//        imWel.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.wel));
         imWel.postDelayed(new Runnable() {
             @Override
             public void run() {
