@@ -18,6 +18,8 @@
     </style>
 
     <style name="welTheme" parent="AppTheme">
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowBackground">@color/lucency</item>
     </style>
 

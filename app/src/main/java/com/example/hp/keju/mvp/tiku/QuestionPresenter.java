@@ -56,9 +56,11 @@ public class QuestionPresenter implements QuestionContract.Presenter {
         }
         LogUtil.e("condition", condition);
         List<QuestionEntity> data = LocalQuestionCRUDUtil.getInstance(mView.getApp()).retrieve(condition);
-        mView.showToast("数量:" + data.size());
+
         if (data.size() <= 0) {
             mView.showToast("没有查询到试题的答案，施主还是自强吧！");
+        } else {
+            mView.showToast("数量:" + data.size());
         }
         mView.showQuestions(data);
         mView.showProgressBar(false);

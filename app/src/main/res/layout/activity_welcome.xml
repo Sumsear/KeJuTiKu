@@ -10,6 +10,7 @@
         android:id="@+id/wel_im"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:scaleType="centerCrop"
         android:contentDescription="@string/toast_icon_desc"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
