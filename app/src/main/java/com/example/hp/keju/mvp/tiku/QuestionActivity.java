@@ -22,6 +22,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import com.example.hp.keju.KeJuApplication;
 import com.example.hp.keju.R;
 import com.example.hp.keju.adapter.AnswerAdapter;
 import com.example.hp.keju.callback.PermissionCallBack;
@@ -32,12 +33,13 @@ import com.example.hp.keju.entity.QuestionEntity;
 import com.example.hp.keju.util.FileUtil;
 import com.example.hp.keju.util.LogUtil;
 import com.example.hp.keju.ocr.RecognizeService;
+import com.example.hp.keju.util.NetworkUtil;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class QuestionActivity extends BaseActivity implements QuestionContract.View{
+public class QuestionActivity extends BaseActivity implements QuestionContract.View {
 
     private final static int GET_QUESTION_SUCCESS = 0x0001;
     private final static int GET_QUESTION_DEFAULT = 0x0002;
@@ -56,10 +58,9 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
     private PermissionCallBack mCallBack = new PermissionCallBack() {
         @Override
         public void granted(int code) {
-            switch (code){
-                case 10086:
-
-                break;
+            switch (code) {
+                case 1000:
+                    break;
                 default:
                     break;
             }
@@ -67,7 +68,7 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
 
         @Override
         public void denied(int code) {
-
+            showToast("施主，请进入设置页给定权限哦！");
         }
     };
 
@@ -76,7 +77,7 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question);
 
-        requestPermission(Manifest.permission.READ_PHONE_STATE, 1000, mCallBack);
+//        requestPermission(Manifest.permission.READ_PHONE_STATE, 1000, mCallBack);
 
         new QuestionPresenter(this);
 
@@ -116,7 +117,11 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
 
                 switch (item.getItemId()) {
                     case R.id.menu_init:
-                        mPresenter.initQuestions();
+                        if (NetworkUtil.checkNetwork(getApplicationContext())){
+                            mPresenter.initQuestions();
+                        }else{
+                          showToast("施主，您的手机该交网费了！");
+                        }
                         break;
                 }
                 return true;
