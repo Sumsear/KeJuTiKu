@@ -1,6 +1,5 @@
 package com.example.hp.keju.mvp.tiku;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.Application;
 import android.app.ProgressDialog;
@@ -22,7 +21,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import com.example.hp.keju.KeJuApplication;
 import com.example.hp.keju.R;
 import com.example.hp.keju.adapter.AnswerAdapter;
 import com.example.hp.keju.callback.PermissionCallBack;

@@ -6,6 +6,7 @@ import com.example.hp.keju.callback.RequestCallBack;
 import com.example.hp.keju.constant.Constants;
 import com.example.hp.keju.entity.QuestionEntity;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,17 +40,42 @@ public class BMobCRUDUtil {
     }
 
     /**
-     * TODO 批量增加
+     * TODO 单个增加
      *
      * @param entity   实例
      * @param callBack 回调
      */
-    public void create(QuestionEntity entity, final RequestCallBack<String> callBack) {
+    public <T extends BmobObject> void create(T entity, final RequestCallBack<String> callBack) {
 
-        if (entity == null || TextUtils.isEmpty(entity.getQ())
-                || TextUtils.isEmpty(entity.getA())) {
+        if (entity == null) {
             callBack.defeated(Constants.GET_DATA_PARAMS_ERROR, "参数异常!");
             return;
+        }
+
+        //通过反射查看传入的对象是否有变量未赋值
+        Class clz = entity.getClass();
+        Field[] fields = clz.getDeclaredFields();
+        try {
+            for (Field field : fields) {
+                field.setAccessible(true);
+                String name = field.getName();
+                Class<?> type = field.getType();
+                if (type == String.class) {
+                    String val = (String) field.get(entity);
+                    if (TextUtils.isEmpty(val)) {
+                        callBack.defeated(Constants.GET_DATA_PARAMS_ERROR, "参数异常!");
+                        return;
+                    }
+                } else if (type == List.class) {
+                    List<?> val = (List<?>) field.get(entity);
+                    if (val == null || val.size() == 0){
+                        callBack.defeated(Constants.GET_DATA_PARAMS_ERROR, "参数异常!");
+                        return;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         entity.save(new SaveListener<String>() {
@@ -70,7 +96,7 @@ public class BMobCRUDUtil {
      * @param entities 实例集合
      * @param callBack 回调
      */
-    public void create(List<QuestionEntity> entities, final RequestCallBack<Integer> callBack) {
+    public <T extends BmobObject> void create(List<T> entities, final RequestCallBack<Integer> callBack) {
 
         int size;
         if (entities == null || (size = entities.size()) == 0) {

@@ -1,7 +1,10 @@
 package com.example.hp.keju.mvp.tiku;
 
 
+import android.text.TextUtils;
+
 import com.example.hp.keju.callback.RequestCallBack;
+import com.example.hp.keju.entity.ErrorQuestionEntity;
 import com.example.hp.keju.entity.QuestionEntity;
 import com.example.hp.keju.util.BMobCRUDUtil;
 import com.example.hp.keju.util.HttpUtil;
@@ -59,6 +62,7 @@ public class QuestionPresenter implements QuestionContract.Presenter {
 
         if (data.size() <= 0) {
             mView.showToast("没有查询到试题的答案，施主还是自强吧！");
+            reportErrorQuestion(new ErrorQuestionEntity(condition));
         } else {
             mView.showToast("数量:" + data.size());
         }
@@ -69,6 +73,26 @@ public class QuestionPresenter implements QuestionContract.Presenter {
     @Override
     public void getQuestionsByDuoWan(String condition) {
         getQuestionByDuoWan(condition);
+    }
+
+    @Override
+    public void reportErrorQuestion(ErrorQuestionEntity question) {
+
+        if (question != null && !TextUtils.isEmpty(question.getQ())){
+            BMobCRUDUtil.getInstance().create(question, new RequestCallBack<String>() {
+                @Override
+                public void success(int code, String data) {
+                    //错题上传成功
+                    LogUtil.e("上报成功");
+                }
+
+                @Override
+                public void defeated(int code, String msg) {
+                    //错题上传失败
+                    LogUtil.e(msg);
+                }
+            });
+        }
     }
 
 

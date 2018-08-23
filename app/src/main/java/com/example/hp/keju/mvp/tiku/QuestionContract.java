@@ -2,6 +2,7 @@ package com.example.hp.keju.mvp.tiku;
 
 import android.app.Application;
 
+import com.example.hp.keju.entity.ErrorQuestionEntity;
 import com.example.hp.keju.entity.QuestionEntity;
 import com.example.hp.keju.mvp.BasePresenter;
 import com.example.hp.keju.mvp.BaseView;
@@ -28,6 +29,8 @@ public class QuestionContract {
         void getQuestionsByLocal(String condition);
 
         void getQuestionsByDuoWan(String condition);
+
+        void reportErrorQuestion(ErrorQuestionEntity question);
     }
 
 }
