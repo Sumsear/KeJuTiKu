@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import com.example.hp.keju.callback.RequestCallBack;
 import com.example.hp.keju.entity.ErrorQuestionEntity;
 import com.example.hp.keju.entity.QuestionEntity;
+import com.example.hp.keju.entity.UpdateApplication;
 import com.example.hp.keju.util.BMobCRUDUtil;
 import com.example.hp.keju.util.HttpUtil;
 import com.example.hp.keju.util.LocalQuestionCRUDUtil;
@@ -78,7 +79,7 @@ public class QuestionPresenter implements QuestionContract.Presenter {
     @Override
     public void reportErrorQuestion(ErrorQuestionEntity question) {
 
-        if (question != null && !TextUtils.isEmpty(question.getQ())){
+        if (question != null && !TextUtils.isEmpty(question.getQ())) {
             BMobCRUDUtil.getInstance().create(question, new RequestCallBack<String>() {
                 @Override
                 public void success(int code, String data) {
@@ -95,6 +96,23 @@ public class QuestionPresenter implements QuestionContract.Presenter {
         }
     }
 
+    @Override
+    public void checkUpdate() {
+
+        BMobCRUDUtil.getInstance().retrieveUpdateApp(new RequestCallBack<List<UpdateApplication>>() {
+            @Override
+            public void success(int code, List<UpdateApplication> data) {
+                UpdateApplication ua = data.get(0);
+                LogUtil.e(ua.getVersion() + " " + ua.getVersionInfo() + " " + ua.getDownload());
+            }
+
+            @Override
+            public void defeated(int code, String msg) {
+
+            }
+        });
+    }
+
 
     /**
      * TODO
@@ -104,7 +122,7 @@ public class QuestionPresenter implements QuestionContract.Presenter {
      */
     private void getQuestionByBmob(final int offset, final int count) {
         //服务端查询问题以及答案
-        BMobCRUDUtil.getInstance().retrieve(offset, count, new RequestCallBack<List<QuestionEntity>>() {
+        BMobCRUDUtil.getInstance().retrieveQuestion(offset, count, new RequestCallBack<List<QuestionEntity>>() {
             @Override
             public void success(int code, List<QuestionEntity> data) {
                 initCount = data.size();

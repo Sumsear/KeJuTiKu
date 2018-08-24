@@ -20,6 +20,8 @@ public class QuestionContract {
 
         void showQuestions(List<QuestionEntity> questions);
 
+        void displayNotificationView(String content, boolean display);
+
     }
 
     interface Presenter extends BasePresenter {
@@ -31,6 +33,8 @@ public class QuestionContract {
         void getQuestionsByDuoWan(String condition);
 
         void reportErrorQuestion(ErrorQuestionEntity question);
+
+        void checkUpdate();
     }
 
 }

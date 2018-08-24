@@ -14,12 +14,14 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.example.hp.keju.R;
 import com.example.hp.keju.adapter.AnswerAdapter;
@@ -45,9 +47,10 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
     private static final int REQUEST_CODE_GENERAL_BASIC = 106;
 
     private Toolbar tbTitle;
+    private TextView tvNotifacation;
+    private RecyclerView rvAnswer;
     private EditText etQuestion;
     private Button btnSearch;
-    private RecyclerView rvAnswer;
     private AnswerAdapter adapter;
 
     private QuestionContract.Presenter mPresenter;
@@ -80,7 +83,9 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
         new QuestionPresenter(this);
 
         initView();
+        initDate();
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -115,16 +120,18 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
 
                 switch (item.getItemId()) {
                     case R.id.menu_init:
-                        if (NetworkUtil.checkNetwork(getApplicationContext())){
+                        if (NetworkUtil.checkNetwork(getApplicationContext())) {
                             mPresenter.initQuestions();
-                        }else{
-                          showToast("施主，您的手机该交网费了！");
+                        } else {
+                            showToast("施主，您的手机该交网费了！");
                         }
                         break;
                 }
                 return true;
             }
         });
+
+        tvNotifacation = findViewById(R.id.tv_notification);
 
         etQuestion = findViewById(R.id.et_q);
 
@@ -156,6 +163,14 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
         pd.setMessage("正在加载，请稍后...");
     }
 
+    /**
+     * TODO 初始化数据
+     */
+    private void initDate() {
+
+        mPresenter.checkUpdate();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.question_init, menu);
@@ -170,9 +185,11 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
     @Override
     public void showProgressBar(boolean show) {
         if (show) {
+            tvNotifacation.setVisibility(View.VISIBLE);
             pd.show();
         } else {
             pd.dismiss();
+            tvNotifacation.setVisibility(View.GONE);
         }
     }
 
@@ -184,6 +201,16 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
         msg.what = GET_QUESTION_SUCCESS;
         msg.setData(data);
         mHandler.sendMessage(msg);
+    }
+
+    @Override
+    public void displayNotificationView(String content, boolean display) {
+        if (display) {
+            if (!TextUtils.isEmpty(content)) tvNotifacation.setText(content);
+            tvNotifacation.setVisibility(View.VISIBLE);
+        } else {
+            tvNotifacation.setVisibility(View.GONE);
+        }
     }
 
     @Override

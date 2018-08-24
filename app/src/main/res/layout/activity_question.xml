@@ -19,16 +19,30 @@
 
     </android.support.v7.widget.Toolbar>
 
+    <TextView
+        android:id="@+id/tv_notification"
+        android:layout_width="0dp"
+        android:layout_height="35dp"
+        android:text="发现新版本，是否更新!"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:textSize="13sp"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/main_title"
+        android:background="@android:color/holo_orange_light"/>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_a"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="4dp"
         android:layout_marginBottom="4dp"
+        android:layout_marginTop="4dp"
         app:layout_constraintBottom_toTopOf="@+id/interval_line"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/main_title">
+        app:layout_constraintTop_toBottomOf="@id/tv_notification">
 
     </android.support.v7.widget.RecyclerView>
 
@@ -49,9 +63,9 @@
         android:layout_height="45dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:inputType="text"
         android:enabled="false"
         android:hint="@string/et_hint_question"
+        android:inputType="text"
         android:textSize="14sp"
         app:layout_constraintBottom_toTopOf="@+id/btn_s"
         app:layout_constraintLeft_toLeftOf="parent"

@@ -125,7 +125,7 @@ public class QIntentService extends IntentService {
      */
     private void getQuestionByBmob(final int offset, final int count) {
         //服务端查询问题以及答案
-        BMobCRUDUtil.getInstance().retrieve(offset, count, new RequestCallBack<List<QuestionEntity>>() {
+        BMobCRUDUtil.getInstance().retrieveQuestion(offset, count, new RequestCallBack<List<QuestionEntity>>() {
             @Override
             public void success(int code, List<QuestionEntity> data) {
                 initCount = data.size();

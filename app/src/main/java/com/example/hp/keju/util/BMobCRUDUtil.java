@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.example.hp.keju.callback.RequestCallBack;
 import com.example.hp.keju.constant.Constants;
 import com.example.hp.keju.entity.QuestionEntity;
+import com.example.hp.keju.entity.UpdateApplication;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -68,7 +69,7 @@ public class BMobCRUDUtil {
                     }
                 } else if (type == List.class) {
                     List<?> val = (List<?>) field.get(entity);
-                    if (val == null || val.size() == 0){
+                    if (val == null || val.size() == 0) {
                         callBack.defeated(Constants.GET_DATA_PARAMS_ERROR, "参数异常!");
                         return;
                     }
@@ -125,7 +126,7 @@ public class BMobCRUDUtil {
      * @param count    每次获取总数
      * @param callBack 回调
      */
-    public void retrieve(int offset, int count, final RequestCallBack<List<QuestionEntity>> callBack) {
+    public void retrieveQuestion(int offset, int count, final RequestCallBack<List<QuestionEntity>> callBack) {
 
         BmobQuery<QuestionEntity> bmobQuery = new BmobQuery<>();
         bmobQuery.setLimit(count);
@@ -152,7 +153,37 @@ public class BMobCRUDUtil {
                 }
             }
         });
+    }
 
+    /**
+     * TODO 查询应用更新信息
+     *
+     * @param callBack 回调
+     */
+    public void retrieveUpdateApp(final RequestCallBack<List<UpdateApplication>> callBack) {
+
+        BmobQuery<UpdateApplication> bq = new BmobQuery<>();
+        bq.findObjects(new FindListener<UpdateApplication>() {
+            @Override
+            public void done(List<UpdateApplication> list, BmobException e) {
+                LogUtil.e("size: " + list.size());
+                if (e == null && list.size() > 0) {
+                    callBack.success(Constants.GET_DATA_SUCCESS, list);
+                } else {
+                    int code;
+                    String msg;
+                    if (e != null) {
+                        code = e.getErrorCode();
+                        msg = e.getMessage();
+                    } else {
+                        code = Constants.GET_DATA_NO_DATA;
+                        msg = "没有数据!";
+                    }
+                    LogUtil.e("result: " + code + msg);
+                    callBack.defeated(code, msg);
+                }
+            }
+        });
     }
 
     public void update() {
