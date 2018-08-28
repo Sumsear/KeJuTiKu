@@ -3,6 +3,7 @@ package com.example.hp.keju.mvp.tiku;
 import android.app.Activity;
 import android.app.Application;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Message;
@@ -34,6 +35,7 @@ import com.example.hp.keju.util.FileUtil;
 import com.example.hp.keju.util.LogUtil;
 import com.example.hp.keju.ocr.RecognizeService;
 import com.example.hp.keju.util.NetworkUtil;
+import com.example.hp.keju.util.UpdateUtil;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -55,6 +57,7 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
 
     private QuestionContract.Presenter mPresenter;
     private ProgressDialog pd;
+    private volatile String mUpdateMessage;
 
     private PermissionCallBack mCallBack = new PermissionCallBack() {
         @Override
@@ -105,6 +108,76 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.question_init, menu);
+        return true;
+    }
+
+    @Override
+    public Application getApp() {
+        return getApplication();
+    }
+
+    @Override
+    public void showProgressBar(boolean show) {
+        if (show) {
+            pd.show();
+        } else {
+            pd.dismiss();
+        }
+    }
+
+    @Override
+    public void showQuestions(List<QuestionEntity> questions) {
+        Message msg = new Message();
+        Bundle data = new Bundle();
+        data.putParcelableArrayList("questions", (ArrayList<? extends Parcelable>) questions);
+        msg.what = GET_QUESTION_SUCCESS;
+        msg.setData(data);
+        mHandler.sendMessage(msg);
+    }
+
+    @Override
+    public void displayNotificationView(String content, boolean display) {
+        if (display) {
+            if (!TextUtils.isEmpty(content)) tvNotifacation.setText(content);
+            mUpdateMessage = content;
+            tvNotifacation.setVisibility(View.VISIBLE);
+        } else {
+            tvNotifacation.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void setPresenter(QuestionContract.Presenter presenter) {
+        mPresenter = presenter;
+    }
+
+    @Override
+    public void handleMessage(Activity activity, Message msg) {
+        if (activity instanceof QuestionActivity) {
+            QuestionActivity ac = (QuestionActivity) activity;
+            switch (msg.what) {
+                case GET_QUESTION_SUCCESS:
+                    List<QuestionEntity> questions = msg.getData().getParcelableArrayList("questions");
+                    ac.adapter.setData(questions);
+                    ac.pd.dismiss();
+                    break;
+                case GET_QUESTION_DEFAULT:
+                    ac.pd.dismiss();
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    @Override
+    public void showToast(String msg) {
+        super.showToast(msg);
+    }
+
     /**
      * TODO 初始化 VIEW
      */
@@ -132,6 +205,12 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
         });
 
         tvNotifacation = findViewById(R.id.tv_notification);
+        tvNotifacation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showUpdateDialog(mUpdateMessage);
+            }
+        });
 
         etQuestion = findViewById(R.id.et_q);
 
@@ -167,74 +246,7 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
      * TODO 初始化数据
      */
     private void initDate() {
-
         mPresenter.checkUpdate();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.question_init, menu);
-        return true;
-    }
-
-    @Override
-    public Application getApp() {
-        return getApplication();
-    }
-
-    @Override
-    public void showProgressBar(boolean show) {
-        if (show) {
-            tvNotifacation.setVisibility(View.VISIBLE);
-            pd.show();
-        } else {
-            pd.dismiss();
-            tvNotifacation.setVisibility(View.GONE);
-        }
-    }
-
-    @Override
-    public void showQuestions(List<QuestionEntity> questions) {
-        Message msg = new Message();
-        Bundle data = new Bundle();
-        data.putParcelableArrayList("questions", (ArrayList<? extends Parcelable>) questions);
-        msg.what = GET_QUESTION_SUCCESS;
-        msg.setData(data);
-        mHandler.sendMessage(msg);
-    }
-
-    @Override
-    public void displayNotificationView(String content, boolean display) {
-        if (display) {
-            if (!TextUtils.isEmpty(content)) tvNotifacation.setText(content);
-            tvNotifacation.setVisibility(View.VISIBLE);
-        } else {
-            tvNotifacation.setVisibility(View.GONE);
-        }
-    }
-
-    @Override
-    public void setPresenter(QuestionContract.Presenter presenter) {
-        mPresenter = presenter;
-    }
-
-    @Override
-    public void handleMessage(Activity activity, Message msg) {
-        if (activity instanceof QuestionActivity) {
-            QuestionActivity ac = (QuestionActivity) activity;
-            switch (msg.what) {
-                case GET_QUESTION_SUCCESS:
-                    List<QuestionEntity> questions = msg.getData().getParcelableArrayList("questions");
-                    ac.adapter.setData(questions);
-                    ac.pd.dismiss();
-                    break;
-                case GET_QUESTION_DEFAULT:
-                    ac.pd.dismiss();
-                    break;
-                default:
-                    break;
-            }
-        }
     }
 
     /**
@@ -267,9 +279,36 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
         builder.create().show();
     }
 
-    @Override
-    public void showToast(String msg) {
-        super.showToast(msg);
-    }
+    /**
+     * TODO xianshi
+     *
+     * @param message 更新信息
+     */
+    private void showUpdateDialog(String message) {
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("应用更新");
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.setPositiveButton("更新", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //更新APP
+                UpdateUtil.getInstance().download(QuestionActivity.this, "http://codown.youdao.com/dictmobile/youdaodict_android_youdaoweb.apk");
+            }
+        });
+        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                //关闭提示窗口
+                displayNotificationView("", false);
+            }
+        });
+        builder.setMessage(message);
+        builder.create().show();
+    }
 }

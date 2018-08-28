@@ -8,6 +8,7 @@ import cn.bmob.v3.BmobObject;
 public class UpdateApplication extends BmobObject implements Parcelable {
 
     private String version;
+    private int versionCode;
     private String versionInfo;
     private String download;
 
@@ -16,6 +17,7 @@ public class UpdateApplication extends BmobObject implements Parcelable {
 
     protected UpdateApplication(Parcel in) {
         version = in.readString();
+        versionCode = in.readInt();
         versionInfo = in.readString();
         download = in.readString();
     }
@@ -40,6 +42,7 @@ public class UpdateApplication extends BmobObject implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(version);
+        dest.writeInt(versionCode);
         dest.writeString(versionInfo);
         dest.writeString(download);
     }
@@ -50,6 +53,14 @@ public class UpdateApplication extends BmobObject implements Parcelable {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public int getVersionCode() {
+        return versionCode;
+    }
+
+    public void setVersionCode(int versionCode) {
+        this.versionCode = versionCode;
     }
 
     public String getVersionInfo() {

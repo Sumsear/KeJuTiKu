@@ -3,6 +3,7 @@ package com.example.hp.keju.mvp.tiku;
 
 import android.text.TextUtils;
 
+import com.example.hp.keju.BuildConfig;
 import com.example.hp.keju.callback.RequestCallBack;
 import com.example.hp.keju.entity.ErrorQuestionEntity;
 import com.example.hp.keju.entity.QuestionEntity;
@@ -104,6 +105,9 @@ public class QuestionPresenter implements QuestionContract.Presenter {
             public void success(int code, List<UpdateApplication> data) {
                 UpdateApplication ua = data.get(0);
                 LogUtil.e(ua.getVersion() + " " + ua.getVersionInfo() + " " + ua.getDownload());
+                if (BuildConfig.VERSION_CODE < ua.getVersionCode()) {
+                    mView.displayNotificationView("发现新版本，点击更新！", true);
+                }
             }
 
             @Override
