@@ -1,119 +1,173 @@
 package com.example.hp.keju.util;
 
-import android.app.DownloadManager;
-import android.content.Context;
-import android.net.Uri;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.example.hp.keju.R;
-
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class UpdateUtil {
 
-    private static UpdateUtil instance;
-    private static long downloadId = -1;
     private Handler mHandler = new Handler(Looper.getMainLooper());
+    private String mUrl;
+    private String mPath;
+    private String mFileName;
+    private DownloadListener mListener;
 
-    private UpdateUtil() {
+    public UpdateUtil(String url, String path, String fileName, DownloadListener listener) {
+        this.mUrl = url;
+        this.mPath = path;
+        this.mFileName = fileName;
+        this.mListener = listener;
     }
-
-    public static UpdateUtil getInstance() {
-        if (instance == null) {
-            synchronized (UpdateUtil.class) {
-                if (instance == null) {
-                    instance = new UpdateUtil();
-                }
-            }
-        }
-        return instance;
-    }
-
-    public long download(Context context, String url) {
-
-        DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-        if (dm != null) {
-            LogUtil.e("DownloadManager != null");
-            LogUtil.e("url: " + url);
-            Uri uri = Uri.parse(url);
-            if (downloadId != -1) {
-                dm.remove(downloadId);
-            }
-            String title = context.getString(R.string.app_name);
-
-            File file = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS + "/" + title);
-            if (file != null && file.exists()) {
-                file.delete();
-            }
-            DownloadManager.Request request = new DownloadManager.Request(uri);
-            request.setTitle(title);
-            request.setDescription("一个正在慢慢完善的科举答题App");
-            request.setAllowedOverMetered(true);
-            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-            request.setMimeType("application/vnd.android.package-archive");
-            request.setDestinationInExternalFilesDir(context, Environment.DIRECTORY_DOWNLOADS, title);
-            request.setVisibleInDownloadsUi(true);
-            downloadId = dm.enqueue(request);
-        }
-        return downloadId;
-    }
-
 
     /**
-     * TODO 开始下载
-     *
-     * @param url      下载地址
-     * @param path     存储地址
-     * @param fileName 文件名
+     * TODO 执行
      */
-    public void download(String url, String path, String fileName) {
-        //需要处理
+    public void excute() {
+
+        Thread task = new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                HttpURLConnection conn = null;
+                BufferedInputStream buf = null;
+                FileOutputStream fos = null;
+                try {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mListener.onStart();
+                        }
+                    });
+                    String absolute;
+                    //文件操作
+                    File path = new File(mPath);
+                    if (!path.exists()) {
+                        LogUtil.e(path.mkdirs() + "");
+                    }
+                    if (mPath.length() - mPath.lastIndexOf("/") != 1) {
+                        absolute = mPath + "/" + mFileName;
+                    } else {
+                        absolute = mPath + mFileName;
+                    }
+                    File file = new File(absolute);
+                    if (!file.getParentFile().exists()) {
+                        file.getParentFile().mkdirs();
+                    }
+                    //准备网络请求
+                    URL url = new URL(mUrl);
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setConnectTimeout(15000);
+                    conn.setReadTimeout(15000);
+                    conn.setDefaultUseCaches(true);
+                    conn.setRequestMethod("GET");
+                    conn.setRequestProperty("Charset", "UTF-8");
+                    conn.connect();
+                    int code = conn.getResponseCode();
+                    LogUtil.e("response code = " + code);
+                    if (code != 200) {
+                        return;
+                    }
+                    buf = new BufferedInputStream(conn.getInputStream());
+                    fos = new FileOutputStream(file);
+                    final long len = conn.getContentLength();
+                    byte[] bytes = new byte[1024];
+                    int offset;
+                    long size = 0;//必须用long类型，否则文件过大的情况下计算的时候会超出int的限制
+                    int progress = 0;
+                    while ((offset = buf.read(bytes)) > 0) {
+                        fos.write(bytes, 0, offset);
+                        size += offset;
+                        final int finalSize = (int)(size * 100 / len);
+                        if (progress != finalSize) {
+                            mHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mListener.onProgress(finalSize);
+                                }
+                            });
+                        }
+                        progress = finalSize;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    mListener.onFailure(e.getMessage());
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mListener.onDone();
+                        }
+                    });
+                } finally {
+                    if (conn != null) conn.disconnect();
+                    try {
+                        if (buf != null) buf.close();
+                        if (fos != null) fos.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mListener.onDone();
+                    }
+                });
+            }
+        });
+        task.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread t, final Throwable e) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mListener.onFailure(e.getMessage());
+                    }
+                });
+            }
+        });
+        task.start();
     }
 
-    public class Build {
+
+    public static class Builder {
 
         private String url;
         private String path;
         private String fileName;
         private DownloadListener listener;
 
-        public String getUrl() {
-            return url;
-        }
-
-        public Build setUrl(String url) {
+        public Builder setUrl(String url) {
             this.url = url;
             return this;
         }
 
-        public String getPath() {
-            return path;
-        }
-
-        public Build setPath(String path) {
+        public Builder setPath(String path) {
             this.path = path;
             return this;
         }
 
-        public String getFileName() {
-            return fileName;
-        }
-
-        public Build setFileName(String fileName) {
+        public Builder setFileName(String fileName) {
             this.fileName = fileName;
             return this;
         }
 
-        public void build(DownloadListener listener) {
+        public void setListener(DownloadListener listener) {
             this.listener = listener;
+        }
+
+        public UpdateUtil build() {
             //开始下载任务
-            download(url, path, fileName);
+            return new UpdateUtil(url, path, fileName, listener);
         }
     }
 
-    interface DownloadListener {
+    public interface DownloadListener {
 
         void onStart();
 

@@ -1,11 +1,13 @@
 package com.example.hp.keju.mvp.tiku;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Environment;
 import android.os.Message;
 import android.os.Parcelable;
 import android.os.Bundle;
@@ -82,6 +84,8 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
         setContentView(R.layout.activity_question);
 
 //        requestPermission(Manifest.permission.READ_PHONE_STATE, 1000, mCallBack);
+        requestPermission(Manifest.permission.READ_EXTERNAL_STORAGE, 1001, mCallBack);
+        requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, 1002, mCallBack);
 
         new QuestionPresenter(this);
 
@@ -298,7 +302,36 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 //更新APP
-                UpdateUtil.getInstance().download(QuestionActivity.this, "http://codown.youdao.com/dictmobile/youdaodict_android_youdaoweb.apk");
+                UpdateUtil.Builder build = new UpdateUtil.Builder();
+                build.setUrl("http://codown.youdao.com/dictmobile/youdaodict_android_youdaoweb.apk");
+                String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/keJu";
+                LogUtil.e(path);
+                build.setPath(path);
+                build.setFileName(getString(R.string.app_name) + ".apk");
+                build.setListener(new UpdateUtil.DownloadListener() {
+                    @Override
+                    public void onStart() {
+                        LogUtil.e("开始");
+                    }
+
+                    @Override
+                    public void onProgress(int progress) {
+                        LogUtil.e(progress + "%");
+                    }
+
+                    @Override
+                    public void onDone() {
+                        LogUtil.e("结束");
+                        //调用安装应用
+                    }
+
+                    @Override
+                    public void onFailure(String msg) {
+                        LogUtil.e(msg);
+                    }
+                });
+                build.build().excute();
+
             }
         });
         builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
