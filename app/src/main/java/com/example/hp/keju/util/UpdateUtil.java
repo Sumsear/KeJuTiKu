@@ -18,7 +18,7 @@ public class UpdateUtil {
     private String mFileName;
     private DownloadListener mListener;
 
-    public UpdateUtil(String url, String path, String fileName, DownloadListener listener) {
+    private UpdateUtil(String url, String path, String fileName, DownloadListener listener) {
         this.mUrl = url;
         this.mPath = path;
         this.mFileName = fileName;
@@ -26,24 +26,70 @@ public class UpdateUtil {
     }
 
     /**
+     * TODO 开始
+     */
+    private void onStart() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mListener.onStart();
+            }
+        });
+    }
+
+    /**
+     * TODO 进度
+     *
+     * @param progress 进度
+     */
+    private void onProgress(final int progress) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mListener.onProgress(progress);
+            }
+        });
+    }
+
+    /**
+     * TODO 结束
+     */
+    private void onDone(final File file) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mListener.onDone(file);
+            }
+        });
+    }
+
+    /**
+     * TODO
+     *
+     * @param msg 失败信息
+     */
+    private void onFailure(final String msg) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mListener.onFailure(msg);
+            }
+        });
+    }
+
+    /**
      * TODO 执行
      */
-    public void excute() {
+    public void execute() {
 
         Thread task = new Thread(new Runnable() {
             @Override
             public void run() {
-
                 HttpURLConnection conn = null;
                 BufferedInputStream buf = null;
                 FileOutputStream fos = null;
                 try {
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mListener.onStart();
-                        }
-                    });
+                    onStart();
                     String absolute;
                     //文件操作
                     File path = new File(mPath);
@@ -79,30 +125,20 @@ public class UpdateUtil {
                     byte[] bytes = new byte[1024];
                     int offset;
                     long size = 0;//必须用long类型，否则文件过大的情况下计算的时候会超出int的限制
-                    int progress = 0;
+                    int temp = 0;
                     while ((offset = buf.read(bytes)) > 0) {
                         fos.write(bytes, 0, offset);
                         size += offset;
-                        final int finalSize = (int)(size * 100 / len);
-                        if (progress != finalSize) {
-                            mHandler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mListener.onProgress(finalSize);
-                                }
-                            });
+                        int progress = (int) (size * 100 / len);
+                        if (progress != temp) {
+                            onProgress(progress);
                         }
-                        progress = finalSize;
+                        temp = progress;
                     }
+                    onDone(file);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    mListener.onFailure(e.getMessage());
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mListener.onDone();
-                        }
-                    });
+                    onFailure(e.getMessage());
                 } finally {
                     if (conn != null) conn.disconnect();
                     try {
@@ -112,12 +148,6 @@ public class UpdateUtil {
                         e.printStackTrace();
                     }
                 }
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mListener.onDone();
-                    }
-                });
             }
         });
         task.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
@@ -133,7 +163,6 @@ public class UpdateUtil {
         });
         task.start();
     }
-
 
     public static class Builder {
 
@@ -157,8 +186,9 @@ public class UpdateUtil {
             return this;
         }
 
-        public void setListener(DownloadListener listener) {
+        public Builder setListener(DownloadListener listener) {
             this.listener = listener;
+            return this;
         }
 
         public UpdateUtil build() {
@@ -173,7 +203,7 @@ public class UpdateUtil {
 
         void onProgress(int progress);
 
-        void onDone();
+        void onDone(File file);
 
         void onFailure(String msg);
     }

@@ -15,6 +15,7 @@ import android.text.TextUtils;
 
 import com.example.hp.keju.callback.PermissionCallBack;
 import com.example.hp.keju.util.CustomToast;
+import com.example.hp.keju.util.LogUtil;
 
 import java.lang.ref.SoftReference;
 
@@ -61,19 +62,48 @@ public abstract class BaseActivity extends AppCompatActivity {
             if (checkSelfPermission(permission) == PackageManager.PERMISSION_DENIED) {
                 requestPermissions(new String[]{permission}, code);
             } else {
-                mCallBack.granted(code);
+                mCallBack.granted(code, permission);
             }
         }
     }
 
+    /**
+     * TODO 申请权限
+     *
+     * @param permission 权限
+     * @param code       请求码
+     * @param callBack   回调
+     */
+    public void requestPermission(String[] permission, int code, PermissionCallBack callBack) {
+
+        if (callBack == null) return;
+        mCallBack = callBack;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            String[] temp = new String[permission.length];
+            int index = 0;
+            for (String p : permission) {
+                if (checkSelfPermission(p) == PackageManager.PERMISSION_DENIED) {
+                    temp[index] = p;
+                    index++;
+                } else {
+                    mCallBack.granted(code, p);
+                }
+            }
+            if (index > 0) {
+                requestPermissions(temp, code);
+            }
+        }
+    }
+
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        for (int code : grantResults) {
-            if (PackageManager.PERMISSION_GRANTED == code) {
-                mCallBack.granted(requestCode);
+        for (int i = 0; i < grantResults.length; i++) {
+            if (PackageManager.PERMISSION_GRANTED == grantResults[i]) {
+                mCallBack.granted(requestCode, permissions[i]);
             } else {
-                mCallBack.denied(requestCode);
+                mCallBack.denied(requestCode, permissions[i]);
             }
         }
     }

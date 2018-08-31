@@ -33,13 +33,10 @@ import java.util.List;
 public class QIntentService extends IntentService {
 
     private static final String ACTION_INIT_QUESTION = "com.example.hp.keju.service.action.INIT_QUESTION";
-    private static final int NOTIFICATION_ID = 10086;
-    private static final String NOTIFICATION_CHANNEL_ID = "NOTIFY_ID";
-    private static final String NOTIFICATION_CHANNEL_NAME = "NOTIFY_NAME";
 
     private volatile int initCount;//多线程调用，volatile 防止出现并发问题
     private final List<QuestionEntity> questions = new ArrayList<>(1000);
-    private NotificationManager nm;
+
 
     public QIntentService() {
         super("QIntentService");
@@ -48,15 +45,12 @@ public class QIntentService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-        nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (nm != null) {
-            nm.cancel(NOTIFICATION_ID);
-        }
     }
 
     /**
@@ -76,30 +70,8 @@ public class QIntentService extends IntentService {
         if (intent != null) {
             final String action = intent.getAction();
             if (ACTION_INIT_QUESTION.equals(action)) {
-                showNotification("正在更新", false);
                 initQuestion();
             }
-        }
-    }
-
-    /**
-     * TODO 发送通知
-     */
-    private void showNotification(String content, boolean isComplete) {
-        NotificationCompat.Builder nb = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
-        nb.setAutoCancel(true);
-        nb.setSmallIcon(R.mipmap.ic_launcher);
-        nb.setContentTitle("更新题库");
-        nb.setContentText(content);
-        if (!isComplete) {
-            nb.setProgress(100, 100, true);
-        }
-        if (nm != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                NotificationChannel nc = new NotificationChannel(NOTIFICATION_CHANNEL_ID, NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
-                nm.createNotificationChannel(nc);
-            }
-            nm.notify(NOTIFICATION_ID, nb.build());
         }
     }
 
@@ -134,7 +106,7 @@ public class QIntentService extends IntentService {
                     getQuestionByBmob(offset + count, count);
                 } else {
                     LocalQuestionCRUDUtil.getInstance(QIntentService.this.getApplication()).create(questions);
-                    showNotification(String.format("本次更新题目 %s 条", questions.size()), true);
+                    CustomToast.show(QIntentService.this, String.format("本次更新题目 %s 条", questions.size()));
                 }
             }
 

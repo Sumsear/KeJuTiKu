@@ -7,11 +7,14 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Message;
 import android.os.Parcelable;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -29,6 +32,7 @@ import android.widget.TextView;
 import com.example.hp.keju.R;
 import com.example.hp.keju.adapter.AnswerAdapter;
 import com.example.hp.keju.callback.PermissionCallBack;
+import com.example.hp.keju.constant.Constants;
 import com.example.hp.keju.entity.OCRResultEntity;
 import com.example.hp.keju.mvp.BaseActivity;
 import com.example.hp.keju.ocr.camera.CameraActivity;
@@ -37,9 +41,11 @@ import com.example.hp.keju.util.FileUtil;
 import com.example.hp.keju.util.LogUtil;
 import com.example.hp.keju.ocr.RecognizeService;
 import com.example.hp.keju.util.NetworkUtil;
+import com.example.hp.keju.util.NotificationHelper;
 import com.example.hp.keju.util.UpdateUtil;
 import com.google.gson.Gson;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,9 +69,10 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
 
     private PermissionCallBack mCallBack = new PermissionCallBack() {
         @Override
-        public void granted(int code) {
-            switch (code) {
-                case 1000:
+        public void granted(int code, String permission) {
+            switch (permission) {
+                case Manifest.permission.WRITE_EXTERNAL_STORAGE:
+                    updateApplication();
                     break;
                 default:
                     break;
@@ -73,7 +80,7 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
         }
 
         @Override
-        public void denied(int code) {
+        public void denied(int code, String permission) {
             showToast("施主，请进入设置页给定权限哦！");
         }
     };
@@ -84,8 +91,6 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
         setContentView(R.layout.activity_question);
 
 //        requestPermission(Manifest.permission.READ_PHONE_STATE, 1000, mCallBack);
-        requestPermission(Manifest.permission.READ_EXTERNAL_STORAGE, 1001, mCallBack);
-        requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, 1002, mCallBack);
 
         new QuestionPresenter(this);
 
@@ -301,37 +306,9 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
         builder.setPositiveButton("更新", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                //更新APP
-                UpdateUtil.Builder build = new UpdateUtil.Builder();
-                build.setUrl("http://codown.youdao.com/dictmobile/youdaodict_android_youdaoweb.apk");
-                String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/keJu";
-                LogUtil.e(path);
-                build.setPath(path);
-                build.setFileName(getString(R.string.app_name) + ".apk");
-                build.setListener(new UpdateUtil.DownloadListener() {
-                    @Override
-                    public void onStart() {
-                        LogUtil.e("开始");
-                    }
-
-                    @Override
-                    public void onProgress(int progress) {
-                        LogUtil.e(progress + "%");
-                    }
-
-                    @Override
-                    public void onDone() {
-                        LogUtil.e("结束");
-                        //调用安装应用
-                    }
-
-                    @Override
-                    public void onFailure(String msg) {
-                        LogUtil.e(msg);
-                    }
-                });
-                build.build().excute();
-
+                LogUtil.e("点击权限");
+                requestPermission(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1001, mCallBack);
             }
         });
         builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -343,5 +320,57 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
         });
         builder.setMessage(message);
         builder.create().show();
+    }
+
+    private void updateApplication() {
+        final NotificationHelper helper = new NotificationHelper(QuestionActivity.this);
+        helper.setTitle(QuestionActivity.this.getString(R.string.app_name));
+        helper.setContent("下载应用");
+        helper.setMaxProgress(100);
+
+        //更新APP
+        UpdateUtil.Builder build = new UpdateUtil.Builder();
+        build.setUrl("http://codown.youdao.com/dictmobile/youdaodict_android_youdaoweb.apk");
+        String path = Constants.DOWNLOAD;
+        LogUtil.e(path);
+        build.setPath(path);
+        build.setFileName(getString(R.string.app_name) + ".apk");
+        build.setListener(new UpdateUtil.DownloadListener() {
+            @Override
+            public void onStart() {
+                LogUtil.e("开始");
+            }
+
+            @Override
+            public void onProgress(int progress) {
+                helper.notification(progress);
+            }
+
+            @Override
+            public void onDone(File file) {
+                helper.destroyed();
+
+                //调用安装应用
+                Intent install = new Intent(Intent.ACTION_VIEW);
+                install.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                Uri uri;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    uri = FileProvider.getUriForFile(QuestionActivity.this, "com.xzh.jskjapplication.fileprovider", file);
+                    //对目标应用临时授权该Uri所代表的文件
+                    install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                } else {
+                    uri = Uri.fromFile(file);
+                }
+                install.setDataAndType(uri, "application/vnd.android.package-archive");
+                QuestionActivity.this.startActivity(install);
+            }
+
+            @Override
+            public void onFailure(String msg) {
+                LogUtil.e(msg);
+                helper.destroyed();
+            }
+        });
+        build.build().execute();
     }
 }
