@@ -38,7 +38,7 @@ public class HttpUtil {
     }
 
 
-    public void get(final String urlAddress, final RequestCallBack<List<QuestionEntity>> callBack) {
+    public void get(final String urlAddress, final RequestCallBack<String> callBack) {
 
         executor.execute(new Runnable() {
             @Override
@@ -70,7 +70,7 @@ public class HttpUtil {
                         }
                         String result = sb.toString().substring(sb.toString().indexOf("{"), sb.lastIndexOf("}") + 1);
                         LogUtil.e("result", result);
-                        callBack.success(code, analyse(result));
+                        callBack.success(code, result);
                     } else {
                         callBack.defeated(code, conn.getResponseMessage());
                     }
@@ -82,31 +82,6 @@ public class HttpUtil {
                 }
             }
         });
-    }
-
-    /**
-     * TODO 解析结果
-     *
-     * @param result json
-     * @return list of result
-     */
-    private List<QuestionEntity> analyse(String result) {
-
-        List<QuestionEntity> questions = new ArrayList<>();
-        try {
-            SearchEntity entity = new Gson().fromJson(result, SearchEntity.class);
-            if ("ok".equals(entity.getStatus())) {
-                questions.addAll(entity.getList());
-                for (int i = 0; i < questions.size(); i++) {
-                    QuestionEntity e = questions.get(i);
-                    LogUtil.e("question", e.getQ());
-                    LogUtil.e("answer", e.getA());
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return questions;
     }
 
 

@@ -7,11 +7,13 @@ import com.example.hp.keju.BuildConfig;
 import com.example.hp.keju.callback.RequestCallBack;
 import com.example.hp.keju.entity.ErrorQuestionEntity;
 import com.example.hp.keju.entity.QuestionEntity;
+import com.example.hp.keju.entity.SearchEntity;
 import com.example.hp.keju.entity.UpdateApplication;
 import com.example.hp.keju.util.BMobCRUDUtil;
 import com.example.hp.keju.util.HttpUtil;
 import com.example.hp.keju.util.LocalQuestionCRUDUtil;
 import com.example.hp.keju.util.LogUtil;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -155,10 +157,11 @@ public class QuestionPresenter implements QuestionContract.Presenter {
     private void getQuestionByDuoWan(String q) {
         String url = String.format("http://tool.duowan.com/jx3/ui/exam/ex.php?s=1&q=%s&_=" + System.currentTimeMillis(), q);
         LogUtil.e("getQuestionByDuoWan", url);
-        HttpUtil.getInstance().get(url, new RequestCallBack<List<QuestionEntity>>() {
+        HttpUtil.getInstance().get(url, new RequestCallBack<String>() {
             @Override
-            public void success(int code, List<QuestionEntity> questions) {
+            public void success(int code, String str) {
 
+                List<QuestionEntity> questions = analyse(str);
                 //显示题目
                 mView.showQuestions(questions);
                 //将题目添加到题库
@@ -181,5 +184,30 @@ public class QuestionPresenter implements QuestionContract.Presenter {
                 mView.showToast("没有查询到试题的答案，施主还是自强吧！");
             }
         });
+    }
+
+    /**
+     * TODO 解析结果
+     *
+     * @param result json
+     * @return list of result
+     */
+    private List<QuestionEntity> analyse(String result) {
+
+        List<QuestionEntity> questions = new ArrayList<>();
+        try {
+            SearchEntity entity = new Gson().fromJson(result, SearchEntity.class);
+            if ("ok".equals(entity.getStatus())) {
+                questions.addAll(entity.getList());
+                for (int i = 0; i < questions.size(); i++) {
+                    QuestionEntity e = questions.get(i);
+                    LogUtil.e("question", e.getQ());
+                    LogUtil.e("answer", e.getA());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return questions;
     }
 }
