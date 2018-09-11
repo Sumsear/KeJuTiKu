@@ -10,7 +10,7 @@ import com.example.hp.keju.entity.QuestionEntity;
 import com.example.hp.keju.entity.SearchEntity;
 import com.example.hp.keju.entity.UpdateApplication;
 import com.example.hp.keju.util.BMobCRUDUtil;
-import com.example.hp.keju.util.HttpUtil;
+import com.example.hp.keju.http.HttpUtil;
 import com.example.hp.keju.util.LocalQuestionCRUDUtil;
 import com.example.hp.keju.util.LogUtil;
 import com.google.gson.Gson;

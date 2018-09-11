@@ -1,10 +1,10 @@
-package com.example.hp.keju.util;
+package com.example.hp.keju.http;
 
+
+import android.util.Log;
 
 import com.example.hp.keju.callback.RequestCallBack;
-import com.example.hp.keju.entity.QuestionEntity;
-import com.example.hp.keju.entity.SearchEntity;
-import com.google.gson.Gson;
+import com.example.hp.keju.util.LogUtil;
 
 
 import java.io.IOException;
@@ -12,17 +12,19 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class HttpUtil {
 
+    private static int CPU_COUNT = Runtime.getRuntime().availableProcessors();
     private static HttpUtil instance;
-    private ExecutorService executor = new ThreadPoolExecutor(3, 6, 15, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(10));
+    private static HttpConfig mConfig;
+    private ExecutorService executor = new ThreadPoolExecutor(CPU_COUNT, CPU_COUNT * 2, 15, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(10));
 
     private HttpUtil() {
 
@@ -37,6 +39,20 @@ public class HttpUtil {
         return instance;
     }
 
+    public static void setConfig(HttpConfig config) {
+        if (mConfig == null) {
+            synchronized (HttpUtil.class) {
+                if (mConfig == null)
+                    mConfig = config == null ? HttpConfig.newBuilder().build() : config;
+                else
+                    Log.w("HttpUtil", new IllegalStateException("Only allowed to configure once."));
+            }
+        }
+    }
+
+    public static Builder get(String url) {
+        return new Builder();
+    }
 
     public void get(final String urlAddress, final RequestCallBack<String> callBack) {
 
@@ -84,6 +100,30 @@ public class HttpUtil {
         });
     }
 
+    public static class Builder {
+
+        private ConcurrentHashMap<String, Object> params = new ConcurrentHashMap();
+        private Object tag;
+
+        public ConcurrentHashMap<String, Object> getParams() {
+            return params;
+        }
+
+        public Builder params(String key, Object obj) {
+            if (key != null && obj != null)
+                this.params.put(key, obj);
+            return this;
+        }
+
+        public Object getTag() {
+            return tag;
+        }
+
+        public Builder setTag(Object tag) {
+            this.tag = tag;
+            return this;
+        }
+    }
 
     /**
      * TODO 注销
