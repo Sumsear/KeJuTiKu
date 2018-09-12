@@ -2,11 +2,10 @@ package com.example.hp.keju.http;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 
-public class UrlConnectionFactory {
+public class HttpConnectionFactory {
 
-    public static URLConnection build(String url) {
+    public static HttpConnection build(String url) {
         HttpURLConnection conn = null;
         try {
             URL u = new URL(url);
@@ -22,6 +21,6 @@ public class UrlConnectionFactory {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return conn;
+        return new HttpConnection(conn);
     }
 }

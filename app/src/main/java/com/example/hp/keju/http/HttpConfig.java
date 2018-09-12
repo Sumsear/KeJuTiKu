@@ -9,8 +9,6 @@ public class HttpConfig {
     private long writeTimeOut;
     private Proxy proxy;
 
-    private HttpConfig(){}
-
     private HttpConfig(Builder builder){
         this.readTimeOut = builder.getReadTimeOut() <= 0 ? 15000 : builder.getReadTimeOut();
         this.writeTimeOut = builder.getWriteTimeOut()<=0 ? 15000 : builder.getWriteTimeOut();

@@ -12,7 +12,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -50,8 +49,17 @@ public class HttpUtil {
         }
     }
 
+    public static HttpConfig getConfig(){
+        setConfig(null);
+        return mConfig;
+    }
+
     public static Builder get(String url) {
         return new Builder();
+    }
+
+    public static void cancel(Object tag){
+
     }
 
     public void get(final String urlAddress, final RequestCallBack<String> callBack) {
@@ -122,6 +130,19 @@ public class HttpUtil {
         public Builder setTag(Object tag) {
             this.tag = tag;
             return this;
+        }
+
+        public void perform(RequestCallBack callBack){
+            //执行网络请求
+
+            HttpConnection conn = HttpConnectionFactory.build("");
+            try {
+                int code = conn.getResponseCode();
+                InputStreamReader is = new InputStreamReader(conn.getInputStream());
+
+            }catch (Exception e){
+
+            }
         }
     }
 
