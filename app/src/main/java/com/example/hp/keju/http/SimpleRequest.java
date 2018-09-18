@@ -1,28 +1,37 @@
 package com.example.hp.keju.http;
 
+import com.example.hp.keju.callback.RequestCallBack;
+import com.example.hp.keju.util.IOUtil;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class SimpleRequest implements Runnable, BaseRequest {
+public class SimpleRequest extends BaseRequest {
 
-    private String mUrl;
     private volatile HttpConnection conn;
+    private volatile RequestCallBack<String> mCallBack;
 
-    public SimpleRequest(String url) {
-        this.mUrl = url;
-        conn = HttpConnectionFactory.build(mUrl);
-
+    public SimpleRequest(HttpUtil.Builder builder) {
+        this.mCallBack = builder.getCallBack();
+        this.url = builder.getUrl();
+        this.params = builder.getParams();
+        this.tag = builder.getTag();
+        this.method = builder.getMethod();
+        this.readTimeout = builder.getReadTimeout();
+        this.connectTimeout = builder.getConnectTimeout();
+        this.proxy = builder.getProxy();
     }
 
     @Override
     public void run() {
-
+        conn = HttpConnectionFactory.build(this);
         StringBuilder sb = new StringBuilder();
+        InputStreamReader is = null;
         try {
             int code = conn.getResponseCode();
             if (code == 200) {
-                InputStreamReader is = new InputStreamReader(conn.getInputStream());
-                while (is.read() > 0){
+                is = new InputStreamReader(conn.getInputStream());
+                while (is.read() > 0) {
                     char[] buff = new char[1024];
                     int len = 0;
                     int flag = 0;
@@ -31,9 +40,16 @@ public class SimpleRequest implements Runnable, BaseRequest {
                         flag = len;
                     }
                 }
+                mCallBack.success(code, sb.toString());
+            } else {
+                mCallBack.defeated(code, conn.getResponseMessage());
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            cancel();
+            IOUtil.close(is);
+            RequestManager.getManager().cancel(tag);
         }
     }
 

@@ -2,6 +2,8 @@ package com.example.hp.keju.http;
 
 import android.util.ArrayMap;
 
+import com.example.hp.keju.util.LogUtil;
+
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -26,11 +28,14 @@ public class RequestManager {
         return mInstance;
     }
 
+
     /**
      * TODO 执行
      */
-    public void preform() {
-
+    public void preform(BaseRequest request) {
+        mTags.put(request.getTag(),request);
+        LogUtil.e("xzh",request.getTag()+"");
+        executor.execute(request);
     }
 
     /**

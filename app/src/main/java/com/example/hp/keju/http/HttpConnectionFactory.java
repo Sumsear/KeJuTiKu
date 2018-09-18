@@ -1,22 +1,32 @@
 package com.example.hp.keju.http;
 
+import com.example.hp.keju.util.LogUtil;
+
 import java.net.HttpURLConnection;
+import java.net.Proxy;
 import java.net.URL;
 
 public class HttpConnectionFactory {
 
-    public static HttpConnection build(String url) {
+    public static HttpConnection build(BaseRequest request) {
         HttpURLConnection conn = null;
         try {
-            URL u = new URL(url);
-            conn = (HttpURLConnection) u.openConnection();
-            conn.setReadTimeout(15000);
-            conn.setConnectTimeout(15000);
+
+            Proxy proxy = request.getProxy();
+            URL u = new URL(request.getUrl());
+
+            if (proxy != null) {
+                conn = (HttpURLConnection) u.openConnection(proxy);
+            } else {
+                LogUtil.e("xzh", u.toString());
+                conn = (HttpURLConnection) u.openConnection();
+            }
+            conn.setReadTimeout(request.getReadTimeout());
+            conn.setConnectTimeout(request.getConnectTimeout());
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setRequestProperty("Charset", "UTF-8");
             conn.setRequestProperty("Content-Language", "zh-CN");
-            conn.setRequestProperty("author", "evilwk");
-            conn.setRequestMethod("GET");
+            conn.setRequestMethod(request.getMethod().toString());
             conn.connect();
         } catch (Exception e) {
             e.printStackTrace();

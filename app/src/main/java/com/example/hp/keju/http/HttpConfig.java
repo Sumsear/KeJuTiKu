@@ -5,22 +5,22 @@ import java.net.Proxy;
 public class HttpConfig {
 
 
-    private long readTimeOut;
-    private long writeTimeOut;
+    private int readTimeout;
+    private int connectTimeout;
     private Proxy proxy;
 
     private HttpConfig(Builder builder){
-        this.readTimeOut = builder.getReadTimeOut() <= 0 ? 15000 : builder.getReadTimeOut();
-        this.writeTimeOut = builder.getWriteTimeOut()<=0 ? 15000 : builder.getWriteTimeOut();
+        this.readTimeout = builder.getReadTimeout() <= 0 ? 15000 : builder.getReadTimeout();
+        this.connectTimeout = builder.getConnectTimeout()<=0 ? 15000 : builder.getConnectTimeout();
         this.proxy = builder.getProxy();
     }
 
-    public long getReadTimeOut() {
-        return readTimeOut;
+    public int getReadTimeout() {
+        return readTimeout;
     }
 
-    public long getWriteTimeOut() {
-        return writeTimeOut;
+    public int getConnectTimeout() {
+        return connectTimeout;
     }
 
     public Proxy getProxy() {
@@ -33,25 +33,25 @@ public class HttpConfig {
 
     public static class Builder{
 
-        private long readTimeOut;
-        private long writeTimeOut;
+        private int readTimeout;
+        private int connectTimeout;
         private Proxy proxy;
 
-        public long getReadTimeOut() {
-            return readTimeOut;
+        public int getReadTimeout() {
+            return readTimeout;
         }
 
-        public Builder setReadTimeOut(long readTimeOut) {
-            this.readTimeOut = readTimeOut;
+        public Builder setReadTimeout(int readTimeout) {
+            this.readTimeout = readTimeout;
             return this;
         }
 
-        public long getWriteTimeOut() {
-            return writeTimeOut;
+        public int getConnectTimeout() {
+            return connectTimeout;
         }
 
-        public Builder setWriteTimeOut(long writeTimeOut) {
-            this.writeTimeOut = writeTimeOut;
+        public Builder setConnectTimeout(int connectTimeout) {
+            this.connectTimeout = connectTimeout;
             return this;
         }
 

@@ -12,6 +12,8 @@ import android.view.Window;
 import android.widget.ImageView;
 
 import com.example.hp.keju.R;
+import com.example.hp.keju.callback.RequestCallBack;
+import com.example.hp.keju.http.HttpUtil;
 import com.example.hp.keju.mvp.tiku.QuestionActivity;
 import com.example.hp.keju.service.QIntentService;
 import com.example.hp.keju.util.LogUtil;
@@ -38,6 +40,23 @@ public class WelcomeActivity extends BaseActivity {
         if (NetworkUtil.checkNetwork(this)) {
             //网络可用则开启 服务加载试题
             QIntentService.startInitQuestion(WelcomeActivity.this);
+//            HttpUtil.get("http://tool.duowan.com/jx3/ui/exam/ex.php")
+//                    .params("s","1")
+//                    .params("q","天策")
+//                    .params("_",System.currentTimeMillis())
+//                    .setTag("test")
+//                    .perform(new RequestCallBack<String>() {
+//                @Override
+//                public void success(int code, String data) {
+//                    LogUtil.e(data);
+//                }
+//
+//                @Override
+//                public void defeated(int code, String msg) {
+//                    LogUtil.e(msg);
+//                }
+//            });
+
         }
     }
 

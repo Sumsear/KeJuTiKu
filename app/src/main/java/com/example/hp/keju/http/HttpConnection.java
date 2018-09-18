@@ -1,6 +1,8 @@
 package com.example.hp.keju.http;
 
 
+import com.example.hp.keju.util.LogUtil;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,6 +42,16 @@ public class HttpConnection implements Closeable {
     }
 
     /**
+     * TODO 获取响应信息
+     *
+     * @return ResponseMessage
+     * @throws IOException
+     */
+    public String getResponseMessage() throws IOException {
+        return mConn.getResponseMessage();
+    }
+
+    /**
      * TODO 获取输入流
      *
      * @return InputStream
@@ -62,6 +74,7 @@ public class HttpConnection implements Closeable {
     @Override
     public void close() throws IOException {
         if (mConn != null) {
+            LogUtil.e(HttpUtil.TAG, "close http url connection");
             mConn.disconnect();
         }
     }

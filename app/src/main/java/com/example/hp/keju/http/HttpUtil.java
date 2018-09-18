@@ -11,15 +11,20 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.net.Proxy;
 import java.net.URL;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class HttpUtil {
 
+    public final static String TAG = HttpUtil.class.getSimpleName();
     private static int CPU_COUNT = Runtime.getRuntime().availableProcessors();
     private static HttpUtil instance;
     private static HttpConfig mConfig;
@@ -49,16 +54,16 @@ public class HttpUtil {
         }
     }
 
-    public static HttpConfig getConfig(){
+    public static HttpConfig getConfig() {
         setConfig(null);
         return mConfig;
     }
 
     public static Builder get(String url) {
-        return new Builder();
+        return new Builder(url, RequestMethod.GET);
     }
 
-    public static void cancel(Object tag){
+    public static void cancel(Object tag) {
 
     }
 
@@ -110,8 +115,27 @@ public class HttpUtil {
 
     public static class Builder {
 
+        private String url;
         private ConcurrentHashMap<String, Object> params = new ConcurrentHashMap();
-        private Object tag;
+        private Object tag = new AtomicInteger().getAndIncrement();
+        private RequestMethod method;
+        private RequestCallBack<String> callBack;
+        private int readTimeout;
+        private int connectTimeout;
+        private Proxy proxy;
+
+        Builder(String url, RequestMethod method) {
+            HttpConfig config = getConfig();
+            this.url = url;
+            this.method = method;
+            this.readTimeout = config.getReadTimeout();
+            this.connectTimeout = config.getConnectTimeout();
+            this.proxy = config.getProxy();
+        }
+
+        public String getUrl() {
+            return url;
+        }
 
         public ConcurrentHashMap<String, Object> getParams() {
             return params;
@@ -132,17 +156,57 @@ public class HttpUtil {
             return this;
         }
 
-        public void perform(RequestCallBack callBack){
+        public RequestMethod getMethod() {
+            return method;
+        }
+
+        public RequestCallBack<String> getCallBack() {
+            return callBack;
+        }
+
+        public int getReadTimeout() {
+            return readTimeout;
+        }
+
+        public Builder setReadTimeout(int readTimeout) {
+            this.readTimeout = readTimeout;
+            return this;
+        }
+
+        public int getConnectTimeout() {
+            return connectTimeout;
+        }
+
+        public Builder setConnectTimeout(int connectTimeout) {
+            this.connectTimeout = connectTimeout;
+            return this;
+        }
+
+        public Proxy getProxy() {
+            return proxy;
+        }
+
+        public Builder setProxy(Proxy proxy) {
+            this.proxy = proxy;
+            return this;
+        }
+
+        public void perform(RequestCallBack<String> callBack) {
+            this.callBack = callBack;
             //执行网络请求
-
-            HttpConnection conn = HttpConnectionFactory.build("");
-            try {
-                int code = conn.getResponseCode();
-                InputStreamReader is = new InputStreamReader(conn.getInputStream());
-
-            }catch (Exception e){
-
+            if (RequestMethod.GET.toString().equals(method.toString())) {
+                Set<String> keySet = params.keySet();
+                Iterator<String> keys = keySet.iterator();
+                int index = 0;
+                while (keys.hasNext()) {
+                    String key = keys.next();
+                    String wildcard = index == 0 ? "?" : "&";
+                    //这里有问题
+                    url = url.concat(wildcard).concat(key).concat("=").concat("" + params.get(key));
+                    index++;
+                }
             }
+            RequestManager.getManager().preform(new SimpleRequest(this));
         }
     }
 
