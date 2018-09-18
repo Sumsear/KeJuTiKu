@@ -49,7 +49,7 @@ public class BMobCRUDUtil {
     public <T extends BmobObject> void create(T entity, final RequestCallBack<String> callBack) {
 
         if (entity == null) {
-            callBack.defeated(Constants.GET_DATA_PARAMS_ERROR, "参数异常!");
+            callBack.failure(Constants.GET_DATA_PARAMS_ERROR, "参数异常!");
             return;
         }
 
@@ -64,13 +64,13 @@ public class BMobCRUDUtil {
                 if (type == String.class) {
                     String val = (String) field.get(entity);
                     if (TextUtils.isEmpty(val)) {
-                        callBack.defeated(Constants.GET_DATA_PARAMS_ERROR, "参数异常!");
+                        callBack.failure(Constants.GET_DATA_PARAMS_ERROR, "参数异常!");
                         return;
                     }
                 } else if (type == List.class) {
                     List<?> val = (List<?>) field.get(entity);
                     if (val == null || val.size() == 0) {
-                        callBack.defeated(Constants.GET_DATA_PARAMS_ERROR, "参数异常!");
+                        callBack.failure(Constants.GET_DATA_PARAMS_ERROR, "参数异常!");
                         return;
                     }
                 }
@@ -85,7 +85,7 @@ public class BMobCRUDUtil {
                 if (e == null) {
                     callBack.success(Constants.GET_DATA_SUCCESS, s);
                 } else {
-                    callBack.defeated(e.getErrorCode(), e.getMessage());
+                    callBack.failure(e.getErrorCode(), e.getMessage());
                 }
             }
         });
@@ -112,7 +112,7 @@ public class BMobCRUDUtil {
                 if (e == null) {
                     callBack.success(Constants.GET_DATA_SUCCESS, list.size());
                 } else {
-                    callBack.defeated(e.getErrorCode(), e.getMessage());
+                    callBack.failure(e.getErrorCode(), e.getMessage());
                 }
             }
         });
@@ -149,7 +149,7 @@ public class BMobCRUDUtil {
                         msg = "没有数据!";
                     }
                     LogUtil.e("result: " + code + msg);
-                    callBack.defeated(code, msg);
+                    callBack.failure(code, msg);
                 }
             }
         });
@@ -180,7 +180,7 @@ public class BMobCRUDUtil {
                         msg = "没有数据!";
                     }
                     LogUtil.e("result: " + code + msg);
-                    callBack.defeated(code, msg);
+                    callBack.failure(code, msg);
                 }
             }
         });

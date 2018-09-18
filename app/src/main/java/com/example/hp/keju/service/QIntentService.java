@@ -111,7 +111,7 @@ public class QIntentService extends IntentService {
             }
 
             @Override
-            public void defeated(int code, String msg) {
+            public void failure(int code, String msg) {
 
             }
         });

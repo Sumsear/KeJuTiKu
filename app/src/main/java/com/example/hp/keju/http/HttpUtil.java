@@ -26,21 +26,11 @@ public class HttpUtil {
 
     public final static String TAG = HttpUtil.class.getSimpleName();
     private static int CPU_COUNT = Runtime.getRuntime().availableProcessors();
-    private static HttpUtil instance;
     private static HttpConfig mConfig;
     private ExecutorService executor = new ThreadPoolExecutor(CPU_COUNT, CPU_COUNT * 2, 15, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(10));
 
     private HttpUtil() {
 
-    }
-
-    public static HttpUtil getInstance() {
-        if (instance == null) {
-            synchronized (HttpUtil.class) {
-                if (instance == null) instance = new HttpUtil();
-            }
-        }
-        return instance;
     }
 
     public static void setConfig(HttpConfig config) {
@@ -64,53 +54,7 @@ public class HttpUtil {
     }
 
     public static void cancel(Object tag) {
-
-    }
-
-    public void get(final String urlAddress, final RequestCallBack<String> callBack) {
-
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-
-                StringBuilder sb = new StringBuilder();
-                InputStreamReader is = null;
-                HttpURLConnection conn = null;
-                try {
-                    URL url = new URL(urlAddress);
-                    conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(15000);
-                    conn.setConnectTimeout(15000);
-                    conn.setRequestProperty("Content-Type", "application/json");
-                    conn.setRequestProperty("Charset", "UTF-8");
-                    conn.setRequestProperty("Content-Language", "zh-CN");
-                    conn.setRequestProperty("author", "evilwk");
-                    conn.setRequestMethod("GET");
-                    conn.connect();
-                    int code = conn.getResponseCode();
-                    if (code == 200) {
-                        is = new InputStreamReader(conn.getInputStream());
-                        char[] buff = new char[1024];
-                        int len = 0;
-                        int flag = 0;
-                        while ((len = is.read(buff, len, 10)) != -1) {
-                            sb.append(new String(buff, flag, 10));
-                            flag = len;
-                        }
-                        String result = sb.toString().substring(sb.toString().indexOf("{"), sb.lastIndexOf("}") + 1);
-                        LogUtil.e("result", result);
-                        callBack.success(code, result);
-                    } else {
-                        callBack.defeated(code, conn.getResponseMessage());
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    closeInputStream(is);
-                    disconnect(conn);
-                }
-            }
-        });
+        RequestManager.getManager().cancel(tag);
     }
 
     public static class Builder {

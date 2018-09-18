@@ -34,7 +34,7 @@ public class RequestManager {
      */
     public void preform(BaseRequest request) {
         mTags.put(request.getTag(),request);
-        LogUtil.e("xzh",request.getTag()+"");
+        LogUtil.e(HttpUtil.TAG,request.getTag()+"");
         executor.execute(request);
     }
 

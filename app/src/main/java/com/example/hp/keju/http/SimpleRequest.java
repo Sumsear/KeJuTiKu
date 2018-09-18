@@ -42,7 +42,7 @@ public class SimpleRequest extends BaseRequest {
                 }
                 mCallBack.success(code, sb.toString());
             } else {
-                mCallBack.defeated(code, conn.getResponseMessage());
+                mCallBack.failure(code, conn.getResponseMessage());
             }
         } catch (Exception e) {
             e.printStackTrace();
