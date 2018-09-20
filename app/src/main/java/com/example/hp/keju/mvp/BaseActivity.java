@@ -13,9 +13,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 
 
-import com.example.hp.keju.callback.PermissionCallBack;
+import com.example.hp.keju.callback.PermissionCallback;
 import com.example.hp.keju.util.CustomToast;
-import com.example.hp.keju.util.LogUtil;
 
 import java.lang.ref.SoftReference;
 
@@ -23,7 +22,7 @@ import java.lang.ref.SoftReference;
 public abstract class BaseActivity extends AppCompatActivity {
 
     public MyHandler mHandler = new MyHandler(this);
-    private PermissionCallBack mCallBack;
+    private PermissionCallback mCallBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +53,7 @@ public abstract class BaseActivity extends AppCompatActivity {
      * @param code       请求码
      * @param callBack   回调
      */
-    public void requestPermission(String permission, int code, PermissionCallBack callBack) {
+    public void requestPermission(String permission, int code, PermissionCallback callBack) {
 
         if (callBack == null) return;
         mCallBack = callBack;
@@ -74,7 +73,7 @@ public abstract class BaseActivity extends AppCompatActivity {
      * @param code       请求码
      * @param callBack   回调
      */
-    public void requestPermission(String[] permission, int code, PermissionCallBack callBack) {
+    public void requestPermission(String[] permission, int code, PermissionCallback callBack) {
 
         if (callBack == null) return;
         mCallBack = callBack;

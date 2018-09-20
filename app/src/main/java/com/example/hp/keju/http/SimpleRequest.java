@@ -1,7 +1,7 @@
 package com.example.hp.keju.http;
 
-import com.example.hp.keju.callback.RequestCallBack;
 import com.example.hp.keju.util.IOUtil;
+import com.example.hp.keju.util.LogUtil;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,10 +9,8 @@ import java.io.InputStreamReader;
 public class SimpleRequest extends BaseRequest {
 
     private volatile HttpConnection conn;
-    private volatile RequestCallBack<String> mCallBack;
 
     public SimpleRequest(HttpUtil.Builder builder) {
-        this.mCallBack = builder.getCallBack();
         this.url = builder.getUrl();
         this.params = builder.getParams();
         this.tag = builder.getTag();
@@ -22,8 +20,21 @@ public class SimpleRequest extends BaseRequest {
         this.proxy = builder.getProxy();
     }
 
+
     @Override
-    public void run() {
+    public void cancel() {
+        try {
+            while (conn != null) {
+                conn.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public String call() {
+
         conn = HttpConnectionFactory.build(this);
         StringBuilder sb = new StringBuilder();
         InputStreamReader is = null;
@@ -40,25 +51,16 @@ public class SimpleRequest extends BaseRequest {
                         flag = len;
                     }
                 }
-                mCallBack.success(code, sb.toString());
             } else {
-                mCallBack.failure(code, conn.getResponseMessage());
+                sb.append(conn.getResponseMessage());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         } finally {
             cancel();
             IOUtil.close(is);
             RequestManager.getManager().cancel(tag);
         }
-    }
-
-    @Override
-    public void cancel() {
-        try {
-            conn.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        return sb.toString();
     }
 }

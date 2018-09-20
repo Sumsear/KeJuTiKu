@@ -3,17 +3,13 @@ package com.example.hp.keju.mvp;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.ImageView;
 
 import com.example.hp.keju.R;
-import com.example.hp.keju.callback.RequestCallBack;
-import com.example.hp.keju.http.HttpUtil;
 import com.example.hp.keju.mvp.tiku.QuestionActivity;
 import com.example.hp.keju.service.QIntentService;
 import com.example.hp.keju.util.LogUtil;

@@ -2,7 +2,7 @@ package com.example.hp.keju.util;
 
 import android.text.TextUtils;
 
-import com.example.hp.keju.callback.RequestCallBack;
+import com.example.hp.keju.callback.RequestCallback;
 import com.example.hp.keju.constant.Constants;
 import com.example.hp.keju.entity.QuestionEntity;
 import com.example.hp.keju.entity.UpdateApplication;
@@ -46,7 +46,7 @@ public class BMobCRUDUtil {
      * @param entity   实例
      * @param callBack 回调
      */
-    public <T extends BmobObject> void create(T entity, final RequestCallBack<String> callBack) {
+    public <T extends BmobObject> void create(T entity, final RequestCallback<String> callBack) {
 
         if (entity == null) {
             callBack.failure(Constants.GET_DATA_PARAMS_ERROR, "参数异常!");
@@ -97,7 +97,7 @@ public class BMobCRUDUtil {
      * @param entities 实例集合
      * @param callBack 回调
      */
-    public <T extends BmobObject> void create(List<T> entities, final RequestCallBack<Integer> callBack) {
+    public <T extends BmobObject> void create(List<T> entities, final RequestCallback<Integer> callBack) {
 
         int size;
         if (entities == null || (size = entities.size()) == 0) {
@@ -126,7 +126,7 @@ public class BMobCRUDUtil {
      * @param count    每次获取总数
      * @param callBack 回调
      */
-    public void retrieveQuestion(int offset, int count, final RequestCallBack<List<QuestionEntity>> callBack) {
+    public void retrieveQuestion(int offset, int count, final RequestCallback<List<QuestionEntity>> callBack) {
 
         BmobQuery<QuestionEntity> bmobQuery = new BmobQuery<>();
         bmobQuery.setLimit(count);
@@ -160,7 +160,7 @@ public class BMobCRUDUtil {
      *
      * @param callBack 回调
      */
-    public void retrieveUpdateApp(final RequestCallBack<List<UpdateApplication>> callBack) {
+    public void retrieveUpdateApp(final RequestCallback<List<UpdateApplication>> callBack) {
 
         BmobQuery<UpdateApplication> bq = new BmobQuery<>();
         bq.findObjects(new FindListener<UpdateApplication>() {

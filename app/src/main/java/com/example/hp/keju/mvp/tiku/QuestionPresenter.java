@@ -4,7 +4,8 @@ package com.example.hp.keju.mvp.tiku;
 import android.text.TextUtils;
 
 import com.example.hp.keju.BuildConfig;
-import com.example.hp.keju.callback.RequestCallBack;
+import com.example.hp.keju.callback.RequestCallback;
+import com.example.hp.keju.callback.SimpleCallback;
 import com.example.hp.keju.entity.ErrorQuestionEntity;
 import com.example.hp.keju.entity.QuestionEntity;
 import com.example.hp.keju.entity.SearchEntity;
@@ -79,7 +80,7 @@ public class QuestionPresenter implements QuestionContract.Presenter {
     public void reportErrorQuestion(ErrorQuestionEntity question) {
 
         if (question != null && !TextUtils.isEmpty(question.getQ())) {
-            BMobCRUDUtil.getInstance().create(question, new RequestCallBack<String>() {
+            BMobCRUDUtil.getInstance().create(question, new SimpleCallback<String>() {
                 @Override
                 public void success(int code, String data) {
                     //错题上传成功
@@ -98,7 +99,7 @@ public class QuestionPresenter implements QuestionContract.Presenter {
     @Override
     public void checkUpdate() {
 
-        BMobCRUDUtil.getInstance().retrieveUpdateApp(new RequestCallBack<List<UpdateApplication>>() {
+        BMobCRUDUtil.getInstance().retrieveUpdateApp(new SimpleCallback<List<UpdateApplication>>() {
             @Override
             public void success(int code, List<UpdateApplication> data) {
                 UpdateApplication ua = data.get(0);
@@ -124,7 +125,7 @@ public class QuestionPresenter implements QuestionContract.Presenter {
      */
     private void getQuestionByBmob(final int offset, final int count) {
         //服务端查询问题以及答案
-        BMobCRUDUtil.getInstance().retrieveQuestion(offset, count, new RequestCallBack<List<QuestionEntity>>() {
+        BMobCRUDUtil.getInstance().retrieveQuestion(offset, count, new SimpleCallback<List<QuestionEntity>>() {
             @Override
             public void success(int code, List<QuestionEntity> data) {
                 initCount = data.size();
@@ -157,15 +158,16 @@ public class QuestionPresenter implements QuestionContract.Presenter {
                 .params("q", q)
                 .params("_", System.currentTimeMillis())
                 .setTag("test")
-                .perform(new RequestCallBack<String>() {
+                .perform(new SimpleCallback<String>() {
                     @Override
                     public void success(int code, String data) {
+                        data = data.substring(data.indexOf("{"), data.lastIndexOf("}")+1);
                         LogUtil.e(data);
                         List<QuestionEntity> questions = analyse(data);
                         //显示题目
                         mView.showQuestions(questions);
                         //将题目添加到题库
-                        BMobCRUDUtil.getInstance().create(questions, new RequestCallBack<Integer>() {
+                        BMobCRUDUtil.getInstance().create(questions, new SimpleCallback<Integer>() {
                             @Override
                             public void success(int code, Integer data) {
                                 //添加成功 暂时不做处理

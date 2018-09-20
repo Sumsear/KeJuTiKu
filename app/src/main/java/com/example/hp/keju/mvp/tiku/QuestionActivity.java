@@ -4,12 +4,10 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.Application;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
 import android.os.Message;
 import android.os.Parcelable;
 import android.os.Bundle;
@@ -31,7 +29,7 @@ import android.widget.TextView;
 
 import com.example.hp.keju.R;
 import com.example.hp.keju.adapter.AnswerAdapter;
-import com.example.hp.keju.callback.PermissionCallBack;
+import com.example.hp.keju.callback.PermissionCallback;
 import com.example.hp.keju.constant.Constants;
 import com.example.hp.keju.entity.OCRResultEntity;
 import com.example.hp.keju.mvp.BaseActivity;
@@ -67,7 +65,7 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
     private ProgressDialog pd;
     private volatile String mUpdateMessage;
 
-    private PermissionCallBack mCallBack = new PermissionCallBack() {
+    private PermissionCallback mCallBack = new PermissionCallback() {
         @Override
         public void granted(int code, String permission) {
             switch (permission) {
@@ -203,7 +201,8 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
                 switch (item.getItemId()) {
                     case R.id.menu_init:
                         if (NetworkUtil.checkNetwork(getApplicationContext())) {
-                            mPresenter.initQuestions();
+//                            mPresenter.initQuestions();
+                            mPresenter.getQuestionsByDuoWan("天策");
                         } else {
                             showToast("施主，您的手机该交网费了！");
                         }

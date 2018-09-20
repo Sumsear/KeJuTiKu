@@ -2,9 +2,10 @@ package com.example.hp.keju.http;
 
 
 import java.net.Proxy;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class BaseRequest implements Runnable {
+public abstract class BaseRequest implements Callable<String>, Canceller {
 
     String url;
     ConcurrentHashMap<String, Object> params;
@@ -42,5 +43,4 @@ public abstract class BaseRequest implements Runnable {
         return proxy;
     }
 
-    abstract void cancel();
 }

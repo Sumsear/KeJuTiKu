@@ -3,8 +3,7 @@ package com.example.hp.keju.http;
 
 import android.util.Log;
 
-import com.example.hp.keju.callback.RequestCallBack;
-import com.example.hp.keju.util.LogUtil;
+import com.example.hp.keju.callback.RequestCallback;
 
 
 import java.io.IOException;
@@ -12,7 +11,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
-import java.net.URL;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -63,7 +61,6 @@ public class HttpUtil {
         private ConcurrentHashMap<String, Object> params = new ConcurrentHashMap();
         private Object tag = new AtomicInteger().getAndIncrement();
         private RequestMethod method;
-        private RequestCallBack<String> callBack;
         private int readTimeout;
         private int connectTimeout;
         private Proxy proxy;
@@ -104,10 +101,6 @@ public class HttpUtil {
             return method;
         }
 
-        public RequestCallBack<String> getCallBack() {
-            return callBack;
-        }
-
         public int getReadTimeout() {
             return readTimeout;
         }
@@ -135,8 +128,7 @@ public class HttpUtil {
             return this;
         }
 
-        public void perform(RequestCallBack<String> callBack) {
-            this.callBack = callBack;
+        public void perform(RequestCallback<String> callback) {
             //执行网络请求
             if (RequestMethod.GET.toString().equals(method.toString())) {
                 Set<String> keySet = params.keySet();
@@ -150,7 +142,7 @@ public class HttpUtil {
                     index++;
                 }
             }
-            RequestManager.getManager().preform(new SimpleRequest(this));
+            RequestManager.getManager().preform(new SimpleRequest(this), callback);
         }
     }
 
