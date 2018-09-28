@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 
 
+import com.example.hp.keju.BuildConfig;
 import com.example.hp.keju.callback.PermissionCallback;
 import com.example.hp.keju.util.CustomToast;
 
@@ -27,7 +28,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     /**

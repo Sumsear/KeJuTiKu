@@ -1,10 +1,10 @@
 package com.example.hp.keju.mvp.tiku;
 
 
+import android.content.pm.PackageManager;
 import android.text.TextUtils;
 
 import com.example.hp.keju.BuildConfig;
-import com.example.hp.keju.callback.RequestCallback;
 import com.example.hp.keju.callback.SimpleCallback;
 import com.example.hp.keju.entity.ErrorQuestionEntity;
 import com.example.hp.keju.entity.QuestionEntity;
@@ -58,6 +58,15 @@ public class QuestionPresenter implements QuestionContract.Presenter {
         if (condition.contains("?")) {
             condition = condition.replaceAll("\\?", "？");
         }
+
+        if (condition.contains(":")) {
+            condition = condition.replaceAll(":", "：");
+        }
+
+        if (condition.contains(";")) {
+            condition = condition.replaceAll(";", "；");
+        }
+
         LogUtil.e("condition", condition);
         List<QuestionEntity> data = LocalQuestionCRUDUtil.getInstance(mView.getApp()).retrieve(condition);
 
@@ -187,7 +196,6 @@ public class QuestionPresenter implements QuestionContract.Presenter {
                     }
                 });
 
-        HttpUtil.cancel("test");
     }
 
     /**

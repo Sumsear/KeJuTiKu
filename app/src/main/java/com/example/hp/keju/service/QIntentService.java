@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.Context;
 
 import com.example.hp.keju.callback.RequestCallback;
+import com.example.hp.keju.callback.SimpleCallback;
 import com.example.hp.keju.entity.QuestionEntity;
 import com.example.hp.keju.util.BMobCRUDUtil;
 import com.example.hp.keju.util.CustomToast;
@@ -87,7 +88,7 @@ public class QIntentService extends IntentService {
      */
     private void getQuestionByBmob(final int offset, final int count) {
         //服务端查询问题以及答案
-        BMobCRUDUtil.getInstance().retrieveQuestion(offset, count, new RequestCallback<List<QuestionEntity>>() {
+        BMobCRUDUtil.getInstance().retrieveQuestion(offset, count, new SimpleCallback<List<QuestionEntity>>() {
             @Override
             public void success(int code, List<QuestionEntity> data) {
                 initCount = data.size();

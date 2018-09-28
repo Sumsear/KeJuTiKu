@@ -13,6 +13,7 @@ import android.os.Parcelable;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v4.content.PermissionChecker;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,6 +28,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.hp.keju.BuildConfig;
 import com.example.hp.keju.R;
 import com.example.hp.keju.adapter.AnswerAdapter;
 import com.example.hp.keju.callback.PermissionCallback;
@@ -57,6 +59,7 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
     private Toolbar tbTitle;
     private TextView tvNotifacation;
     private RecyclerView rvAnswer;
+    private TextView tvDeclaration;
     private EditText etQuestion;
     private Button btnSearch;
     private AnswerAdapter adapter;
@@ -168,6 +171,8 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
             switch (msg.what) {
                 case GET_QUESTION_SUCCESS:
                     List<QuestionEntity> questions = msg.getData().getParcelableArrayList("questions");
+                    rvAnswer.setVisibility(View.VISIBLE);
+                    tvDeclaration.setVisibility(View.GONE);
                     ac.adapter.setData(questions);
                     ac.pd.dismiss();
                     break;
@@ -201,8 +206,7 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
                 switch (item.getItemId()) {
                     case R.id.menu_init:
                         if (NetworkUtil.checkNetwork(getApplicationContext())) {
-//                            mPresenter.initQuestions();
-                            mPresenter.getQuestionsByDuoWan("天策");
+                            mPresenter.initQuestions();
                         } else {
                             showToast("施主，您的手机该交网费了！");
                         }
@@ -246,6 +250,9 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
         adapter = new AnswerAdapter();
         rvAnswer.setAdapter(adapter);
 
+        tvDeclaration = findViewById(R.id.tv_declaration);
+        tvDeclaration.setText(R.string.declaration);
+        rvAnswer.setVisibility(View.GONE);
         pd = new ProgressDialog(this);
         pd.setMessage("正在加载，请稍后...");
     }
@@ -254,7 +261,7 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
      * TODO 初始化数据
      */
     private void initDate() {
-        mPresenter.checkUpdate();
+//        mPresenter.checkUpdate();
     }
 
     /**

@@ -5,4 +5,5 @@
     <string name="camera_permission_required">本功能需要相机权限！</string>
     <string name="toast_icon_desc">toast icon</string>
     <string name="et_hint_question">请点击搜索按钮识别考题！</string>
+    <string name="declaration">声明:\n本应用仅用做学习交流，不从事任何非法、盈利活动。\n坚决维护党中央一贯政策，遵守社会主义核心价值观。\n\n若有侵权请联系QQ:1280354728</string>
 </resources>

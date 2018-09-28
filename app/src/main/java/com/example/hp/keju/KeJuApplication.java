@@ -2,7 +2,6 @@ package com.example.hp.keju;
 
 import android.app.Application;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.v4.content.ContextCompat;
 
 import com.baidu.ocr.sdk.OCR;
 import com.baidu.ocr.sdk.OnResultListener;
@@ -14,7 +13,6 @@ import com.example.hp.keju.entity.DaoMaster;
 import com.example.hp.keju.entity.DaoSession;
 import com.example.hp.keju.util.LogUtil;
 
-import org.greenrobot.greendao.DaoLog;
 import org.greenrobot.greendao.query.QueryBuilder;
 
 import cn.bmob.v3.Bmob;
@@ -28,7 +26,6 @@ public class KeJuApplication extends Application {
     public void onCreate() {
         super.onCreate();
         initBmob();
-
 
         LogUtil.setEnable(BuildConfig.DEBUG);
 
