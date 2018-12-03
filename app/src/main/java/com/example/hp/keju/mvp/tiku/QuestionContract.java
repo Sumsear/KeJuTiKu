@@ -30,6 +30,8 @@ public class QuestionContract {
 
         void getQuestionsByLocal(String condition);
 
+        void getQuestionsByLocal(List<String> conditions);
+
         void getQuestionsByDuoWan(String condition);
 
         void reportErrorQuestion(ErrorQuestionEntity question);

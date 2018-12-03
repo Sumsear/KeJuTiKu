@@ -84,7 +84,7 @@ public class LocalQuestionCRUDUtil {
      *
      * @param condition 条件
      */
-    public List<QuestionEntity> retrieve(String condition) {
+    public synchronized List<QuestionEntity> retrieve(String condition) {
 
         QueryBuilder<QuestionEntity> builder = mDao.queryBuilder();
         if (!TextUtils.isEmpty(condition)) {

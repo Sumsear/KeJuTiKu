@@ -1,7 +1,6 @@
 package com.example.hp.keju.mvp.tiku;
 
 
-import android.content.pm.PackageManager;
 import android.text.TextUtils;
 
 import com.example.hp.keju.BuildConfig;
@@ -14,6 +13,7 @@ import com.example.hp.keju.util.BMobCRUDUtil;
 import com.example.hp.keju.http.HttpUtil;
 import com.example.hp.keju.util.LocalQuestionCRUDUtil;
 import com.example.hp.keju.util.LogUtil;
+import com.example.hp.keju.util.StringUtil;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -51,21 +51,7 @@ public class QuestionPresenter implements QuestionContract.Presenter {
             condition = condition.substring(1, condition.length() - 1);
         }
 
-        if (condition.contains(",")) {
-            condition = condition.replaceAll(",", "，");
-        }
-
-        if (condition.contains("?")) {
-            condition = condition.replaceAll("\\?", "？");
-        }
-
-        if (condition.contains(":")) {
-            condition = condition.replaceAll(":", "：");
-        }
-
-        if (condition.contains(";")) {
-            condition = condition.replaceAll(";", "；");
-        }
+        condition = StringUtil.switchPunctuation(condition);
 
         LogUtil.e("condition", condition);
         List<QuestionEntity> data = LocalQuestionCRUDUtil.getInstance(mView.getApp()).retrieve(condition);
@@ -77,6 +63,33 @@ public class QuestionPresenter implements QuestionContract.Presenter {
             mView.showToast("数量:" + data.size());
         }
         mView.showQuestions(data);
+        mView.showProgressBar(false);
+    }
+
+    @Override
+    public void getQuestionsByLocal(List<String> conditions) {
+        mView.showProgressBar(true);
+        List<QuestionEntity> data = new ArrayList<>();
+        for (String condition : conditions) {
+            //长度大于5  去掉首尾，防止首尾文字拍照时不完整导致识别错误
+            if (condition.length() > 5) {
+                condition = condition.substring(1, condition.length() - 1);
+            }
+            condition = StringUtil.switchPunctuation(condition);
+            LogUtil.e("condition", condition);
+            List<QuestionEntity> temp = LocalQuestionCRUDUtil.getInstance(mView.getApp()).retrieve(condition);
+            if (temp.size() <= 0) {
+                reportErrorQuestion(new ErrorQuestionEntity(condition));
+            } else {
+                data.addAll(temp);
+            }
+        }
+        if (data.size() <= 0) {
+            mView.showToast("没有查询到试题的答案，施主还是自强吧！");
+        } else {
+            mView.showQuestions(data);
+            mView.showToast("数量:" + data.size());
+        }
         mView.showProgressBar(false);
     }
 
@@ -170,7 +183,7 @@ public class QuestionPresenter implements QuestionContract.Presenter {
                 .perform(new SimpleCallback<String>() {
                     @Override
                     public void success(int code, String data) {
-                        data = data.substring(data.indexOf("{"), data.lastIndexOf("}")+1);
+                        data = data.substring(data.indexOf("{"), data.lastIndexOf("}") + 1);
                         LogUtil.e(data);
                         List<QuestionEntity> questions = analyse(data);
                         //显示题目

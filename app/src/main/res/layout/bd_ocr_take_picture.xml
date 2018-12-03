@@ -8,9 +8,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:contentView="@+id/camera_view"
-        app:leftDownView="@+id/album_button"
+        app:leftUpView="@+id/album_button"
         app:centerView="@+id/take_photo_button"
-        app:rightUpView="@+id/light_button">
+        app:rightDownView="@+id/light_button">
 
     <com.example.hp.keju.ocr.camera.CameraView
             android:id="@+id/camera_view"

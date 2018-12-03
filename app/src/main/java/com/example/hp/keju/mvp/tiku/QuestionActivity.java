@@ -37,6 +37,7 @@ import com.example.hp.keju.entity.OCRResultEntity;
 import com.example.hp.keju.mvp.BaseActivity;
 import com.example.hp.keju.ocr.camera.CameraActivity;
 import com.example.hp.keju.entity.QuestionEntity;
+import com.example.hp.keju.util.CustomToast;
 import com.example.hp.keju.util.FileUtil;
 import com.example.hp.keju.util.LogUtil;
 import com.example.hp.keju.ocr.RecognizeService;
@@ -112,7 +113,13 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
                         public void onResult(String result) {
                             LogUtil.e(result);
                             OCRResultEntity entity = new Gson().fromJson(result, OCRResultEntity.class);
-                            showListDialog(entity.getWordsResult());
+//                            showListDialog(entity.getWordsResult());
+                            List<String> questions = entity.getWordsResult();
+                            if (questions.size() <= 0) {
+                                CustomToast.show(QuestionActivity.this, "没有获取到问题，请重新扫描!");
+                            } else {
+                                mPresenter.getQuestionsByLocal(entity.getWordsResult());
+                            }
                         }
                     });
         }

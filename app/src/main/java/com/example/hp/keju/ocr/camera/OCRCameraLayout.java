@@ -25,13 +25,13 @@ public class OCRCameraLayout extends FrameLayout {
     private int orientation = ORIENTATION_PORTRAIT;
     private View contentView;
     private View centerView;
-    private View leftDownView;
-    private View rightUpView;
+    private View leftUpView;
+    private View rightDownView;
 
     private int contentViewId;
     private int centerViewId;
-    private int leftDownViewId;
-    private int rightUpViewId;
+    private int leftUpViewId;
+    private int rightDownViewId;
 
     public void setOrientation(int orientation) {
         if (this.orientation == orientation) {
@@ -67,8 +67,8 @@ public class OCRCameraLayout extends FrameLayout {
         try {
             contentViewId = a.getResourceId(R.styleable.OCRCameraLayout_contentView, -1);
             centerViewId = a.getResourceId(R.styleable.OCRCameraLayout_centerView, -1);
-            leftDownViewId = a.getResourceId(R.styleable.OCRCameraLayout_leftDownView, -1);
-            rightUpViewId = a.getResourceId(R.styleable.OCRCameraLayout_rightUpView, -1);
+            leftUpViewId = a.getResourceId(R.styleable.OCRCameraLayout_leftUpView, -1);
+            rightDownViewId = a.getResourceId(R.styleable.OCRCameraLayout_rightDownView, -1);
         } finally {
             a.recycle();
         }
@@ -81,8 +81,8 @@ public class OCRCameraLayout extends FrameLayout {
         if (centerViewId != -1) {
             centerView = findViewById(centerViewId);
         }
-        leftDownView = findViewById(leftDownViewId);
-        rightUpView = findViewById(rightUpViewId);
+        leftUpView = findViewById(leftUpViewId);
+        rightDownView = findViewById(rightDownViewId);
     }
 
     private Rect backgroundRect = new Rect();
@@ -100,8 +100,8 @@ public class OCRCameraLayout extends FrameLayout {
         int left;
         int top;
 
-        MarginLayoutParams leftDownViewLayoutParams = (MarginLayoutParams) leftDownView.getLayoutParams();
-        MarginLayoutParams rightUpViewLayoutParams = (MarginLayoutParams) rightUpView.getLayoutParams();
+        MarginLayoutParams leftDownViewLayoutParams = (MarginLayoutParams) leftUpView.getLayoutParams();
+        MarginLayoutParams rightUpViewLayoutParams = (MarginLayoutParams) rightDownView.getLayoutParams();
         if (r < b) {
             int contentHeight = width * 4 / 3;
             int heightLeft = height - contentHeight;
@@ -122,13 +122,13 @@ public class OCRCameraLayout extends FrameLayout {
             // layout leftDownView
 
             left = leftDownViewLayoutParams.leftMargin;
-            top = contentHeight + (heightLeft - leftDownView.getMeasuredHeight()) / 2;
-            leftDownView
-                    .layout(left, top, left + leftDownView.getMeasuredWidth(), top + leftDownView.getMeasuredHeight());
+            top = contentHeight + (heightLeft - leftUpView.getMeasuredHeight()) / 2;
+            leftUpView
+                    .layout(left, top, left + leftUpView.getMeasuredWidth(), top + leftUpView.getMeasuredHeight());
             // layout rightUpView
-            left = width - rightUpView.getMeasuredWidth() - rightUpViewLayoutParams.rightMargin;
-            top = contentHeight + (heightLeft - rightUpView.getMeasuredHeight()) / 2;
-            rightUpView.layout(left, top, left + rightUpView.getMeasuredWidth(), top + rightUpView.getMeasuredHeight());
+            left = width - rightDownView.getMeasuredWidth() - rightUpViewLayoutParams.rightMargin;
+            top = contentHeight + (heightLeft - rightDownView.getMeasuredHeight()) / 2;
+            rightDownView.layout(left, top, left + rightDownView.getMeasuredWidth(), top + rightDownView.getMeasuredHeight());
         } else {
             int contentWidth = height * 4 / 3;
             int widthLeft = width - contentWidth;
@@ -147,15 +147,15 @@ public class OCRCameraLayout extends FrameLayout {
                         .layout(left, top, left + centerView.getMeasuredWidth(), top + centerView.getMeasuredHeight());
             }
             // layout leftDownView
-            left = contentWidth + (widthLeft - leftDownView.getMeasuredWidth()) / 2;
-            top = height - leftDownView.getMeasuredHeight() - leftDownViewLayoutParams.bottomMargin;
-            leftDownView
-                    .layout(left, top, left + leftDownView.getMeasuredWidth(), top + leftDownView.getMeasuredHeight());
+            left = contentWidth + (widthLeft - leftUpView.getMeasuredWidth()) / 2;
+            top = height - leftUpView.getMeasuredHeight() - leftDownViewLayoutParams.bottomMargin;
+            leftUpView
+                    .layout(left, top, left + leftUpView.getMeasuredWidth(), top + leftUpView.getMeasuredHeight());
             // layout rightUpView
-            left = contentWidth + (widthLeft - rightUpView.getMeasuredWidth()) / 2;
+            left = contentWidth + (widthLeft - rightDownView.getMeasuredWidth()) / 2;
 
             top = rightUpViewLayoutParams.topMargin;
-            rightUpView.layout(left, top, left + rightUpView.getMeasuredWidth(), top + rightUpView.getMeasuredHeight());
+            rightDownView.layout(left, top, left + rightDownView.getMeasuredWidth(), top + rightDownView.getMeasuredHeight());
         }
     }
 
