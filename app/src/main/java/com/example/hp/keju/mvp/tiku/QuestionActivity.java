@@ -302,7 +302,7 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
     }
 
     /**
-     * TODO xianshi
+     * TODO 显示更新信息
      *
      * @param message 更新信息
      */
@@ -335,6 +335,9 @@ public class QuestionActivity extends BaseActivity implements QuestionContract.V
         builder.create().show();
     }
 
+    /**
+     * TODO 更新应用
+     */
     private void updateApplication() {
         final NotificationHelper helper = new NotificationHelper(QuestionActivity.this);
         helper.setTitle(QuestionActivity.this.getString(R.string.app_name));
